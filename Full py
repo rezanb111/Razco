@@ -1,0 +1,1402 @@
+# -*- coding: utf-8 -*-
+"""
+IranCloud VPN Bot v3.0 - Professional Edition
+"""
+
+import asyncio
+import logging
+import random
+import string
+import sqlite3
+from datetime import datetime, timedelta
+from telebot.async_telebot import AsyncTeleBot
+from telebot import types
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+logger = logging.getLogger("IranCloud")
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  CONFIG
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+BOT_TOKEN   = "8980393631:AAHIOvRc-MsDU8HHDxiybfOTUuPsONyFOac"
+ADMIN_ID    = 6779342889
+CHANNEL_ID  = "@iranclod"
+CHANNEL_URL = "https://t.me/iranclod"
+
+WELCOME_IMAGE = "https://raw.githubusercontent.com/rezanb111/test-server/refs/heads/main/NoteGPT_Image_20260606175452.png"
+WALLET_IMAGE  = "https://github.com/rezanb111/test-server/raw/refs/heads/main/NoteGPT_Image_20260606175611.png"
+ACCOUNT_IMAGE = "https://github.com/rezanb111/test-server/raw/refs/heads/main/NoteGPT_Image_20260606180638.png"
+SUPPORT_IMAGE = "https://github.com/rezanb111/test-server/raw/refs/heads/main/NoteGPT_Image_20260606181857.png"
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  PREMIUM EMOJI IDs
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+E = {
+    "de":      "5911096835887337583",
+    "ru":      "5913274246867456342",
+    "us":      "5913463998522592692",
+    "am":      "5913272455866093666",
+    "tr":      "5910995113881901195",
+    "fi":      "5911041344909873378",
+    "fr":      "5913605586414473124",
+    "gb":      "5913443365499703513",
+    "be":      "5913529642802745141",
+    "ca":      "5913623736946265914",
+    "dk":      "5911206009661034712",
+    "kr":      "5913371673905598425",
+    "br":      "5911148568768418614",
+    "it":      "5913688444923547525",
+    "green":   "6084384451154941172",
+    "shop":    "6077678113125306912",
+    "desktop": "5929314699882532260",
+    "laptop":  "5931509565609741639",
+    "gear":    "5929098607192969118",
+    "inf":     "5927241068197187139",
+    "up":      "5933533882480594340",
+    "mobile":  "5958293913675501329",
+    "check":   "6113832658196762761",
+    "link":    "6113813004426416777",
+    "check2":  "6291694847426303062",
+    "red":     "6114054033696101648",
+}
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  PLANS
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+PLANS = [
+    {
+        "id": 1,
+        "name": "ط§ط³طھط§ط±طھط± â€” غµ ع¯غŒع¯ط§ط¨ط§غŒطھ",
+        "gb": 5, "days": 30, "price": 1,
+        "style": "primary",
+        "emoji_id": E["green"],
+        "locations": ["de", "fi"],
+        "desc": (
+            "ظ…ظ†ط§ط³ط¨ ط¨ط±ط§غŒ ع©ط§ط±ط¨ط±ط§ظ† ط³ط¨ع©\n"
+            "ط­ط¬ظ…: غµ ع¯غŒع¯ط§ط¨ط§غŒطھ ط¯ط± ظ…ط§ظ‡\n"
+            "ظ…ط¯طھ: غ³غ° ط±ظˆط²\n"
+            "ظ„ظˆع©غŒط´ظ†: ط¢ظ„ظ…ط§ظ† ظˆ ظپظ†ظ„ط§ظ†ط¯\n"
+            "ظ¾ط±ظˆطھع©ظ„: VMess\n"
+            "ط§طھطµط§ظ„ ظ‡ظ…ط²ظ…ط§ظ†: غ² ط¯ط³طھع¯ط§ظ‡"
+        ),
+    },
+    {
+        "id": 2,
+        "name": "ط¨ط±ظ†ط² â€” غ±غ² ع¯غŒع¯ط§ط¨ط§غŒطھ",
+        "gb": 12, "days": 30, "price": 2,
+        "style": "primary",
+        "emoji_id": E["laptop"],
+        "locations": ["de", "fi", "fr"],
+        "desc": (
+            "ظ…ظ†ط§ط³ط¨ ط¨ط±ط§غŒ ع©ط§ط±ط¨ط±ط§ظ† ظ…طھظˆط³ط·\n"
+            "ط­ط¬ظ…: غ±غ² ع¯غŒع¯ط§ط¨ط§غŒطھ ط¯ط± ظ…ط§ظ‡\n"
+            "ظ…ط¯طھ: غ³غ° ط±ظˆط²\n"
+            "ظ„ظˆع©غŒط´ظ†: ط¢ظ„ظ…ط§ظ†طŒ ظپظ†ظ„ط§ظ†ط¯طŒ ظپط±ط§ظ†ط³ظ‡\n"
+            "ظ¾ط±ظˆطھع©ظ„: VMess + VLESS\n"
+            "ط§طھطµط§ظ„ ظ‡ظ…ط²ظ…ط§ظ†: غ³ ط¯ط³طھع¯ط§ظ‡"
+        ),
+    },
+    {
+        "id": 3,
+        "name": "ظ†ظ‚ط±ظ‡ â€” غ²غ° ع¯غŒع¯ط§ط¨ط§غŒطھ",
+        "gb": 20, "days": 60, "price": 3,
+        "style": "primary",
+        "emoji_id": E["desktop"],
+        "locations": ["de", "fi", "fr", "gb"],
+        "desc": (
+            "ظ…ظ†ط§ط³ط¨ ط¨ط±ط§غŒ ع©ط§ط±ط¨ط±ط§ظ† ظ¾ط±ظ…طµط±ظپ\n"
+            "ط­ط¬ظ…: غ²غ° ع¯غŒع¯ط§ط¨ط§غŒطھ\n"
+            "ظ…ط¯طھ: غ¶غ° ط±ظˆط² (غ² ظ…ط§ظ‡)\n"
+            "ظ„ظˆع©غŒط´ظ†: ط¢ظ„ظ…ط§ظ†طŒ ظپظ†ظ„ط§ظ†ط¯طŒ ظپط±ط§ظ†ط³ظ‡طŒ ط§ظ†ع¯ظ„غŒط³\n"
+            "ظ¾ط±ظˆطھع©ظ„: VMess + VLESS + Trojan\n"
+            "ط§طھطµط§ظ„ ظ‡ظ…ط²ظ…ط§ظ†: غ³ ط¯ط³طھع¯ط§ظ‡"
+        ),
+    },
+    {
+        "id": 4,
+        "name": "ط·ظ„ط§ â€” غ³غµ ع¯غŒع¯ط§ط¨ط§غŒطھ",
+        "gb": 35, "days": 90, "price": 5,
+        "style": "success",
+        "emoji_id": E["up"],
+        "locations": ["de", "fi", "fr", "gb", "us"],
+        "desc": (
+            "ط¨ظ‡طھط±غŒظ† ع¯ط²غŒظ†ظ‡ ط¨ط±ط§غŒ ط®ط§ظ†ظˆط§ط¯ظ‡\n"
+            "ط­ط¬ظ…: غ³غµ ع¯غŒع¯ط§ط¨ط§غŒطھ\n"
+            "ظ…ط¯طھ: غ¹غ° ط±ظˆط² (غ³ ظ…ط§ظ‡)\n"
+            "ظ„ظˆع©غŒط´ظ†: ط¢ظ„ظ…ط§ظ†طŒ ظپظ†ظ„ط§ظ†ط¯طŒ ظپط±ط§ظ†ط³ظ‡طŒ ط§ظ†ع¯ظ„غŒط³طŒ ط¢ظ…ط±غŒع©ط§\n"
+            "ظ¾ط±ظˆطھع©ظ„: VMess + VLESS + Trojan + Reality\n"
+            "ط§طھطµط§ظ„ ظ‡ظ…ط²ظ…ط§ظ†: غµ ط¯ط³طھع¯ط§ظ‡"
+        ),
+    },
+    {
+        "id": 5,
+        "name": "ظ†ط§ظ…ط­ط¯ظˆط¯ â€” ظ…ط§ظ‡ط§ظ†ظ‡",
+        "gb": -1, "days": 30, "price": 7,
+        "style": "success",
+        "emoji_id": E["inf"],
+        "locations": ["de", "fi", "fr", "gb", "us", "ca"],
+        "desc": (
+            "ط­ط¬ظ… ظ†ط§ظ…ط­ط¯ظˆط¯ ظˆط§ظ‚ط¹غŒ ط¨ط¯ظˆظ† ط³ظ‚ظپ\n"
+            "ظ…ط¯طھ: غ³غ° ط±ظˆط²\n"
+            "ظ„ظˆع©غŒط´ظ†: غ¶ ع©ط´ظˆط± ط§ط±ظˆظ¾ط§ ظˆ ط¢ظ…ط±غŒع©ط§\n"
+            "ظ¾ط±ظˆطھع©ظ„: طھظ…ط§ظ… ظ¾ط±ظˆطھع©ظ„â€Œظ‡ط§\n"
+            "ط§طھطµط§ظ„ ظ‡ظ…ط²ظ…ط§ظ†: غµ ط¯ط³طھع¯ط§ظ‡\n"
+            "ط³ط±ط¹طھ: ط­ط¯ط§ع©ط«ط± ط³ط±ط¹طھ ط³ط±ظˆط±"
+        ),
+    },
+    {
+        "id": 6,
+        "name": "ظ†ط§ظ…ط­ط¯ظˆط¯ â€” غ² ظ…ط§ظ‡ظ‡",
+        "gb": -1, "days": 60, "price": 11,
+        "style": "success",
+        "emoji_id": E["inf"],
+        "locations": ["de", "fi", "fr", "gb", "us", "ca"],
+        "desc": (
+            "طµط±ظپظ‡â€Œط¬ظˆغŒغŒ غ²غ²ظھ ظ†ط³ط¨طھ ط¨ظ‡ ظ…ط§ظ‡ط§ظ†ظ‡\n"
+            "ط­ط¬ظ… ظ†ط§ظ…ط­ط¯ظˆط¯ ظˆط§ظ‚ط¹غŒ\n"
+            "ظ…ط¯طھ: غ¶غ° ط±ظˆط² (غ² ظ…ط§ظ‡)\n"
+            "ظ„ظˆع©غŒط´ظ†: غ¶ ع©ط´ظˆط± ط§ط±ظˆظ¾ط§ ظˆ ط¢ظ…ط±غŒع©ط§\n"
+            "ظ¾ط±ظˆطھع©ظ„: طھظ…ط§ظ… ظ¾ط±ظˆطھع©ظ„â€Œظ‡ط§\n"
+            "ط§طھطµط§ظ„ ظ‡ظ…ط²ظ…ط§ظ†: غµ ط¯ط³طھع¯ط§ظ‡"
+        ),
+    },
+    {
+        "id": 7,
+        "name": "ظ†ط§ظ…ط­ط¯ظˆط¯ â€” ط³ط§ظ„ط§ظ†ظ‡",
+        "gb": -1, "days": 365, "price": 15,
+        "style": "success",
+        "emoji_id": E["inf"],
+        "locations": ["de", "fi", "fr", "gb", "us", "ca", "it"],
+        "desc": (
+            "طµط±ظپظ‡â€Œط¬ظˆغŒغŒ غ¶غ´ظھ ظ†ط³ط¨طھ ط¨ظ‡ ظ…ط§ظ‡ط§ظ†ظ‡\n"
+            "ط­ط¬ظ… ظ†ط§ظ…ط­ط¯ظˆط¯ ظˆط§ظ‚ط¹غŒ\n"
+            "ظ…ط¯طھ: غ³غ¶غµ ط±ظˆط² (غ± ط³ط§ظ„ ع©ط§ظ…ظ„)\n"
+            "ظ„ظˆع©غŒط´ظ†: غ· ع©ط´ظˆط±\n"
+            "ظ¾ط±ظˆطھع©ظ„: طھظ…ط§ظ… ظ¾ط±ظˆطھع©ظ„â€Œظ‡ط§\n"
+            "ط§طھطµط§ظ„ ظ‡ظ…ط²ظ…ط§ظ†: غµ ط¯ط³طھع¯ط§ظ‡\n"
+            "ظ¾ط´طھغŒط¨ط§ظ†غŒ ط§ظˆظ„ظˆغŒطھâ€Œط¯ط§ط±"
+        ),
+    },
+    {
+        "id": 8,
+        "name": "VIP â€” ط³ط§ظ„ط§ظ†ظ‡",
+        "gb": -1, "days": 365, "price": 50,
+        "style": "danger",
+        "emoji_id": E["check"],
+        "locations": ["de", "fi", "fr", "gb", "us", "ca", "it", "be", "dk"],
+        "desc": (
+            "ط¨ط§ظ„ط§طھط±غŒظ† ع©غŒظپغŒطھ ط³ط±ظˆغŒط³\n"
+            "ط­ط¬ظ… ظ†ط§ظ…ط­ط¯ظˆط¯ ظˆط§ظ‚ط¹غŒ\n"
+            "ظ…ط¯طھ: غ³غ¶غµ ط±ظˆط²\n"
+            "ظ„ظˆع©غŒط´ظ†: غ¹ ع©ط´ظˆط± ط§ط®طھطµط§طµغŒ\n"
+            "ظ¾ط±ظˆطھع©ظ„: طھظ…ط§ظ… ظ¾ط±ظˆطھع©ظ„â€Œظ‡ط§ + Reality ط§ط®طھطµط§طµغŒ\n"
+            "ط§طھطµط§ظ„ ظ‡ظ…ط²ظ…ط§ظ†: غ±غ° ط¯ط³طھع¯ط§ظ‡\n"
+            "IP ط§ط®طھطµط§طµغŒ\n"
+            "ظ¾ط´طھغŒط¨ط§ظ†غŒ غ²غ´/غ· ط§ظˆظ„ظˆغŒطھâ€Œط¯ط§ط±"
+        ),
+    },
+    {
+        "id": 9,
+        "name": "ظ¾ظ†ظ„ ط®طµظˆطµغŒ Pro",
+        "gb": -1, "days": 30, "price": 20,
+        "style": "danger",
+        "emoji_id": E["gear"],
+        "locations": ["de", "us", "gb"],
+        "desc": (
+            "ظ¾ظ†ظ„ ط§ط®طھطµط§طµغŒ ط¨ط±ط§غŒ ع©ط³ط¨â€Œظˆع©ط§ط±\n"
+            "ط­ط¬ظ… ظ†ط§ظ…ط­ط¯ظˆط¯\n"
+            "ظ…ط¯طھ: غ³0 ط±ظˆط²\n"
+            "ظ„ظˆع©غŒط´ظ†: ط¢ظ„ظ…ط§ظ†طŒ ط¢ظ…ط±غŒع©ط§طŒ ط§ظ†ع¯ظ„غŒط³\n"
+            "طھط¹ط¯ط§ط¯ ع©ط§ط±ط¨ط±: ظ†ط§ظ…ط­ط¯ظˆط¯\n"
+            "ظ¾ظ†ظ„ ظ…ط¯غŒط±غŒطھ ع©ط§ظ…ظ„\n"
+            "IP ط§ط®طھطµط§طµغŒ\n"
+            "SLA 99.9ظھ"
+        ),
+    },
+    {
+        "id": 10,
+        "name": "Enterprise â€” ط³ط§ظ„ط§ظ†ظ‡",
+        "gb": -1, "days": 365, "price": 120,
+        "style": "danger",
+        "emoji_id": E["link"],
+        "locations": ["de", "us", "gb", "fr", "ca", "it", "be", "dk", "kr", "br"],
+        "desc": (
+            "ط±ط§ظ‡â€Œط­ظ„ ط³ط§ط²ظ…ط§ظ†غŒ ع©ط§ظ…ظ„\n"
+            "ط­ط¬ظ… ظ†ط§ظ…ط­ط¯ظˆط¯\n"
+            "ظ…ط¯طھ: غ³غ¶غµ ط±ظˆط²\n"
+            "ظ„ظˆع©غŒط´ظ†: غ±غ° ع©ط´ظˆط±\n"
+            "طھط¹ط¯ط§ط¯ ع©ط§ط±ط¨ط±: ظ†ط§ظ…ط­ط¯ظˆط¯\n"
+            "ظ¾ظ†ظ„ ظ…ط¯غŒط±غŒطھ ظ¾غŒط´ط±ظپطھظ‡\n"
+            "IP ظ‡ط§غŒ ط§ط®طھطµط§طµغŒ ظ…طھط¹ط¯ط¯\n"
+            "ظ¾ط´طھغŒط¨ط§ظ†غŒ ط§ط®طھطµط§طµغŒ غ²غ´/غ·\n"
+            "SLA 99.99ظھ"
+        ),
+    },
+]
+
+FLAG_EMOJIS = {
+    "de": ("ط¢ظ„ظ…ط§ظ† ًں‡©ًں‡ھ", E["de"]),
+    "ru": ("ط±ظˆط³غŒظ‡ ًں‡·ًں‡؛", E["ru"]),
+    "us": ("ط¢ظ…ط±غŒع©ط§ ًں‡؛ًں‡¸", E["us"]),
+    "am": ("ط§ط±ظ…ظ†ط³طھط§ظ† ًں‡¦ًں‡²", E["am"]),
+    "tr": ("طھط±ع©غŒظ‡ ًں‡¹ًں‡·", E["tr"]),
+    "fi": ("ظپظ†ظ„ط§ظ†ط¯ ًں‡«ًں‡®", E["fi"]),
+    "fr": ("ظپط±ط§ظ†ط³ظ‡ ًں‡«ًں‡·", E["fr"]),
+    "gb": ("ط§ظ†ع¯ظ„غŒط³ ًں‡¬ًں‡§", E["gb"]),
+    "be": ("ط¨ظ„عکغŒع© ًں‡§ًں‡ھ", E["be"]),
+    "ca": ("ع©ط§ظ†ط§ط¯ط§ ًں‡¨ًں‡¦", E["ca"]),
+    "dk": ("ط¯ط§ظ†ظ…ط§ط±ع© ًں‡©ًں‡°", E["dk"]),
+    "kr": ("ع©ط±ظ‡ ط¬ظ†ظˆط¨غŒ ًں‡°ًں‡·", E["kr"]),
+    "br": ("ط¨ط±ط²غŒظ„ ًں‡§ًں‡·", E["br"]),
+    "it": ("ط§غŒطھط§ظ„غŒط§ ًں‡®ًں‡¹", E["it"]),
+}
+
+PAYMENT_SITES = [
+    ("ظ¾ط±ط¯ط§ط®طھ ظپط§ ط¯ط§طھ ع©ط§ظ…", "https://pardakhtfa.com"),
+    ("ع†ظ†ط¬ ظپط§", "https://changefa.com"),
+    ("ط§غŒط±ط§ظ†غŒع©ط§ط±طھ", "https://iranicard.ir"),
+]
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  DATABASE
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+def init_db():
+    c = sqlite3.connect("irancloud.db")
+    c.executescript("""
+    CREATE TABLE IF NOT EXISTS users (
+        user_id INTEGER PRIMARY KEY, username TEXT, full_name TEXT,
+        balance REAL DEFAULT 0, joined_at TEXT, is_banned INTEGER DEFAULT 0,
+        captcha_done INTEGER DEFAULT 0, rules_accepted INTEGER DEFAULT 0
+    );
+    CREATE TABLE IF NOT EXISTS transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER,
+        amount REAL, type TEXT, detail TEXT, created_at TEXT
+    );
+    CREATE TABLE IF NOT EXISTS orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER,
+        plan_id INTEGER, plan_name TEXT, price REAL,
+        status TEXT DEFAULT 'pending', config TEXT,
+        created_at TEXT, expires_at TEXT
+    );
+    CREATE TABLE IF NOT EXISTS support_tickets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER,
+        message TEXT, reply TEXT, status TEXT DEFAULT 'open', created_at TEXT
+    );
+    CREATE TABLE IF NOT EXISTS vouchers (
+        code TEXT PRIMARY KEY, amount REAL,
+        used INTEGER DEFAULT 0, used_by INTEGER
+    );
+    CREATE TABLE IF NOT EXISTS pending_vouchers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER, code TEXT, amount REAL,
+        status TEXT DEFAULT 'pending', created_at TEXT
+    );
+    """)
+    c.commit()
+    c.close()
+
+def db():
+    return sqlite3.connect("irancloud.db")
+
+def get_user(uid):
+    with db() as c:
+        return c.execute("SELECT * FROM users WHERE user_id=?", (uid,)).fetchone()
+
+def create_user(uid, uname, fname):
+    with db() as c:
+        c.execute("INSERT OR IGNORE INTO users (user_id,username,full_name,joined_at) VALUES (?,?,?,?)",
+                  (uid, uname, fname, datetime.now().isoformat()))
+
+def get_balance(uid):
+    with db() as c:
+        r = c.execute("SELECT balance FROM users WHERE user_id=?", (uid,)).fetchone()
+        return r[0] if r else 0.0
+
+def update_balance(uid, delta):
+    with db() as c:
+        c.execute("UPDATE users SET balance=balance+? WHERE user_id=?", (delta, uid))
+
+def log_tx(uid, amount, t, detail):
+    with db() as c:
+        c.execute("INSERT INTO transactions (user_id,amount,type,detail,created_at) VALUES (?,?,?,?,?)",
+                  (uid, amount, t, detail, datetime.now().isoformat()))
+
+def get_all_users():
+    with db() as c:
+        return [r[0] for r in c.execute("SELECT user_id FROM users WHERE is_banned=0").fetchall()]
+
+def get_stats():
+    with db() as c:
+        total   = c.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+        banned  = c.execute("SELECT COUNT(*) FROM users WHERE is_banned=1").fetchone()[0]
+        active  = c.execute("SELECT COUNT(*) FROM orders WHERE status='active'").fetchone()[0]
+        revenue = c.execute("SELECT SUM(amount) FROM transactions WHERE type='charge'").fetchone()[0] or 0
+        pending_v = c.execute("SELECT COUNT(*) FROM pending_vouchers WHERE status='pending'").fetchone()[0]
+    return total, banned, active, revenue, pending_v
+
+def add_pending_voucher(uid, code, amount):
+    with db() as c:
+        c.execute("INSERT INTO pending_vouchers (user_id,code,amount,created_at) VALUES (?,?,?,?)",
+                  (uid, code, amount, datetime.now().isoformat()))
+        return c.lastrowid
+
+def get_pending_voucher(vid):
+    with db() as c:
+        return c.execute("SELECT * FROM pending_vouchers WHERE id=?", (vid,)).fetchone()
+
+def approve_voucher(vid):
+    row = get_pending_voucher(vid)
+    if not row or row[4] != "pending":
+        return False, "طھط±ط§ع©ظ†ط´ غŒط§ظپطھ ظ†ط´ط¯ غŒط§ ظ‚ط¨ظ„ط§ظ‹ ظ¾ط±ط¯ط§ط²ط´ ط´ط¯ظ‡."
+    with db() as c:
+        c.execute("UPDATE pending_vouchers SET status='approved' WHERE id=?", (vid,))
+    update_balance(row[1], row[3])
+    log_tx(row[1], row[3], "charge", f"voucher:{row[2]}")
+    return True, row
+
+def reject_voucher(vid):
+    row = get_pending_voucher(vid)
+    if not row:
+        return False
+    with db() as c:
+        c.execute("UPDATE pending_vouchers SET status='rejected' WHERE id=?", (vid,))
+    return row
+
+def ban_user(uid, ban=True):
+    with db() as c:
+        c.execute("UPDATE users SET is_banned=? WHERE user_id=?", (1 if ban else 0, uid))
+
+def set_captcha(uid):
+    with db() as c:
+        c.execute("UPDATE users SET captcha_done=1 WHERE user_id=?", (uid,))
+
+def set_rules(uid):
+    with db() as c:
+        c.execute("UPDATE users SET rules_accepted=1 WHERE user_id=?", (uid,))
+
+def create_order(uid, plan):
+    expires = (datetime.now() + timedelta(days=plan["days"])).isoformat()
+    config = "vmess://eyJob3N0IjoiaXJhbmNsb3VkLm5ldCIsInBvcnQiOjQ0MywicHMiOiJJcmFuQ2xvdWQifQ=="
+    with db() as c:
+        c.execute("INSERT INTO orders (user_id,plan_id,plan_name,price,status,config,created_at,expires_at) VALUES (?,?,?,?,?,?,?,?)",
+                  (uid, plan["id"], plan["name"], plan["price"], "active", config,
+                   datetime.now().isoformat(), expires))
+
+def get_plan(pid):
+    return next((p for p in PLANS if p["id"] == pid), None)
+
+def add_voucher_db(code, amount):
+    with db() as c:
+        c.execute("INSERT OR IGNORE INTO vouchers (code,amount) VALUES (?,?)", (code, amount))
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  BOT + RAW API
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+bot = AsyncTeleBot(BOT_TOKEN)
+init_db()
+
+captcha_store = {}
+pending_action = {}
+broadcast_state = {}
+
+async def api(method: str, **params):
+    import aiohttp
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/{method}"
+    async with aiohttp.ClientSession() as s:
+        async with s.post(url, json=params) as r:
+            return await r.json()
+
+def btn(text, *, cb=None, url=None, style=None, eid=None):
+    d = {"text": text}
+    if cb:    d["callback_data"] = cb
+    if url:   d["url"] = url
+    if style: d["style"] = style
+    if eid:   d["icon_custom_emoji_id"] = eid
+    return d
+
+def mk(*rows):
+    return {"inline_keyboard": list(rows)}
+
+async def send(cid, text, markup=None, pm="HTML"):
+    p = dict(chat_id=cid, text=text, parse_mode=pm)
+    if markup: p["reply_markup"] = markup
+    return await api("sendMessage", **p)
+
+async def send_photo(cid, photo, caption, markup=None, pm="HTML"):
+    p = dict(chat_id=cid, photo=photo, caption=caption, parse_mode=pm)
+    if markup: p["reply_markup"] = markup
+    return await api("sendPhoto", **p)
+
+async def edit_caption(cid, mid, caption, markup=None, pm="HTML"):
+    p = dict(chat_id=cid, message_id=mid, caption=caption, parse_mode=pm)
+    if markup: p["reply_markup"] = markup
+    return await api("editMessageCaption", **p)
+
+async def edit_media(cid, mid, photo, caption, markup=None, pm="HTML"):
+    p = dict(
+        chat_id=cid, message_id=mid,
+        media={"type": "photo", "media": photo, "caption": caption, "parse_mode": pm}
+    )
+    if markup: p["reply_markup"] = markup
+    return await api("editMessageMedia", **p)
+
+async def answer_cb(cid, text="", alert=False):
+    await api("answerCallbackQuery", callback_query_id=cid, text=text, show_alert=alert)
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  KEYBOARDS
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+
+def kb_main(is_admin=False):
+    rows = [
+        [
+            btn("ًں›’  ط®ط±غŒط¯ ظ¾ظ†ظ„ VPN",        cb="buy_menu",  style="success", eid=E["shop"]),
+            btn("ًں‘›  ع©غŒظپ ظ¾ظˆظ„",              cb="wallet",    style="primary", eid=E["green"]),
+        ],
+        [
+            btn("ًں‘¤  ط­ط³ط§ط¨ ع©ط§ط±ط¨ط±غŒ",          cb="account",   style="primary", eid=E["desktop"]),
+            btn("ًںژ«  ظ¾ط´طھغŒط¨ط§ظ†غŒ ط¢ظ†ظ„ط§غŒظ†",     cb="support",   style="primary", eid=E["link"]),
+        ],
+        [
+            btn("ًں“–  ط±ط§ظ‡ظ†ظ…ط§غŒ ط§طھطµط§ظ„",        cb="guide",     style="primary", eid=E["mobile"]),
+            btn("â‌“  ط³ظˆط§ظ„ط§طھ ظ…طھط¯ط§ظˆظ„",        cb="faq",       style="primary"),
+        ],
+        [
+            btn("ًں“‹  ظ‚ظˆط§ظ†غŒظ† ط³ط±ظˆغŒط³",         cb="rules_view"),
+            btn("ًں“،  ع©ط§ظ†ط§ظ„ ظ…ط§",             url=CHANNEL_URL, eid=E["check2"]),
+        ],
+    ]
+    if is_admin:
+        rows.append([btn("âڑ™ï¸ڈ  ظ¾ظ†ظ„ ظ…ط¯غŒط±غŒطھ", cb="admin_panel", style="danger", eid=E["gear"])])
+    return mk(*rows)
+
+
+def kb_buy():
+    rows = []
+    for p in PLANS:
+        gb_text = "â™¾ ظ†ط§ظ…ط­ط¯ظˆط¯" if p["gb"] == -1 else f"{p['gb']} ع¯غŒع¯"
+        rows.append([btn(
+            f"{gb_text}  آ·  {p['name']}  آ·  ${p['price']}",
+            cb=f"plan_{p['id']}", style=p["style"], eid=p.get("emoji_id")
+        )])
+    rows.append([btn("ًں”™  ط¨ط§ط²ع¯ط´طھ", cb="main")])
+    return mk(*rows)
+
+
+def kb_plan(pid, has_balance):
+    rows = [
+        [btn("âœ…  ط®ط±غŒط¯ ط¨ط§ ع©غŒظپ ظ¾ظˆظ„",    cb=f"buy_{pid}", style="success", eid=E["check"])],
+        [btn("ًں’³  ط´ط§ط±عک ع©غŒظپ ظ¾ظˆظ„ ط§ظˆظ„",  cb="charge_wallet", style="primary", eid=E["green"])],
+        [btn("ًں”™  ط¨ط§ط²ع¯ط´طھ ط¨ظ‡ ظ¾ع©غŒط¬â€Œظ‡ط§", cb="buy_menu")],
+    ]
+    if not has_balance:
+        rows[0][0] = btn("â‌Œ  ظ…ظˆط¬ظˆط¯غŒ ع©ط§ظپغŒ ظ†غŒط³طھ â€” ط§ط¨طھط¯ط§ ط´ط§ط±عک ع©ظ†غŒط¯", cb="charge_wallet", style="danger", eid=E["red"])
+    return mk(*rows)
+
+
+def kb_wallet():
+    return mk(
+        [btn("ًں’³  ط´ط§ط±عک ع©غŒظپ ظ¾ظˆظ„",     cb="charge_wallet", style="success", eid=E["green"])],
+        [btn("ًں“œ  طھط§ط±غŒط®ع†ظ‡ طھط±ط§ع©ظ†ط´â€Œظ‡ط§", cb="tx_history",    style="primary")],
+        [btn("ًں”™  ط¨ط§ط²ع¯ط´طھ",            cb="main")],
+    )
+
+
+def kb_charge():
+    rows = []
+    for name, url_ in PAYMENT_SITES:
+        rows.append([btn(f"ًںŒگ  ط®ط±غŒط¯ غŒظˆâ€Œظˆظˆع†ط± ط§ط² {name}", url=url_, style="primary", eid=E["link"])])
+    rows.append([btn("âœ…  ع©ط¯ غŒظˆâ€Œظˆظˆع†ط± ط¯ط§ط±ظ… â€” ظˆط§ط±ط¯ ع©ط±ط¯ظ†", cb="enter_voucher", style="success", eid=E["check"])])
+    rows.append([btn("ًں”™  ط¨ط§ط²ع¯ط´طھ",                     cb="wallet")])
+    return mk(*rows)
+
+
+def kb_support():
+    return mk(
+        [btn("âœ‰ï¸ڈ  ط§ط±ط³ط§ظ„ ظ¾غŒط§ظ… ط¬ط¯غŒط¯",    cb="send_support", style="primary", eid=E["link"])],
+        [btn("ًں”™  ط¨ط§ط²ع¯ط´طھ",             cb="main")],
+    )
+
+
+def kb_admin():
+    return mk(
+        [btn("ًں“ٹ  ط¢ظ…ط§ط± ع©ط§ظ…ظ„",           cb="adm_stats",        style="primary", eid=E["up"])],
+        [btn("ًں“¢  ظ¾غŒط§ظ… ظ‡ظ…ع¯ط§ظ†غŒ",         cb="adm_broadcast",    style="primary", eid=E["mobile"])],
+        [btn("ًں‘¤  ط¬ط³طھط¬ظˆ ع©ط§ط±ط¨ط±",         cb="adm_search",       style="primary", eid=E["desktop"])],
+        [btn("ًں’°  ط§ظپط²ط§غŒط´ ظ…ظˆط¬ظˆط¯غŒ",       cb="adm_add_bal",      style="success", eid=E["green"]),
+         btn("ًں’¸  ع©ط§ظ‡ط´ ظ…ظˆط¬ظˆط¯غŒ",        cb="adm_dec_bal",      style="danger",  eid=E["red"])],
+        [btn("ًںڑ«  ط¨ظ„ط§ع© ع©ط§ط±ط¨ط±",         cb="adm_ban",          style="danger",  eid=E["red"]),
+         btn("âœ…  ط¢ظ†ط¨ظ„ط§ع© ع©ط§ط±ط¨ط±",       cb="adm_unban",        style="success", eid=E["check"])],
+        [btn("ًںژںï¸ڈ  ط³ط§ط®طھ ظˆظˆع†ط±",         cb="adm_make_voucher", style="success", eid=E["shop"])],
+        [btn("ًں“‹  طھغŒع©طھâ€Œظ‡ط§غŒ ظ¾ط´طھغŒط¨ط§ظ†غŒ",  cb="adm_tickets",      style="primary", eid=E["link"])],
+        [btn("ًں’ژ  ظˆظˆع†ط±ظ‡ط§غŒ ط¯ط± ط§ظ†طھط¸ط§ط±",  cb="adm_vouchers",     style="danger",  eid=E["up"])],
+        [btn("ًں”™  ط¨ط§ط²ع¯ط´طھ",             cb="main")],
+    )
+
+
+def kb_captcha(answer, uid):
+    nums = [answer] + random.sample([i for i in range(2, 30) if i != answer], 3)
+    random.shuffle(nums)
+    row = [btn(str(n), cb=f"cap_{n}_{uid}",
+               style="success" if n == answer else "danger") for n in nums]
+    return mk(row)
+
+
+def kb_join():
+    return mk(
+        [btn("ًں“،  ط¹ط¶ظˆغŒطھ ط¯ط± ع©ط§ظ†ط§ظ„ ط±ط³ظ…غŒ IranCloud", url=CHANNEL_URL, style="primary", eid=E["check2"])],
+        [btn("âœ…  ط¹ط¶ظˆ ط´ط¯ظ… â€” ظˆط±ظˆط¯ ط¨ظ‡ ط±ط¨ط§طھ",        cb="check_join",  style="success", eid=E["check"])],
+    )
+
+
+def kb_rules():
+    return mk(
+        [btn("âœ…  ظ‚ظˆط§ظ†غŒظ† ط±ط§ ط®ظˆط§ظ†ط¯ظ… ظˆ ظ…غŒâ€Œظ¾ط°غŒط±ظ…", cb="accept_rules", style="success", eid=E["check"])],
+    )
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  HELPERS
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+async def check_channel(uid):
+    try:
+        m = await bot.get_chat_member(CHANNEL_ID, uid)
+        return m.status in ("member", "administrator", "creator")
+    except:
+        return False
+
+async def send_captcha(uid):
+    a, b = random.randint(2, 9), random.randint(2, 9)
+    captcha_store[uid] = a * b
+    text = (
+        "ًں”گ <b>طھط£غŒغŒط¯ ط§ظ…ظ†غŒطھغŒ IranCloud</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        "ط¨ط±ط§غŒ ظˆط±ظˆط¯ ط¨ظ‡ ط±ط¨ط§طھطŒ ظ¾ط§ط³ط® ط³ط¤ط§ظ„ ط±غŒط§ط¶غŒ ط²غŒط± ط±ط§ ط§ظ†طھط®ط§ط¨ ع©ظ†غŒط¯.\n"
+        "ط§غŒظ† ظ…ط±ط­ظ„ظ‡ ط¨ط±ط§غŒ ط¬ظ„ظˆع¯غŒط±غŒ ط§ط² ط±ط¨ط§طھâ€Œظ‡ط§غŒ ظ…ط®ط±ط¨ ط§ط³طھ.\n\n"
+        f"â‌“  <b>{a} أ— {b} = ?</b>\n\n"
+        "غŒع©غŒ ط§ط² ع¯ط²غŒظ†ظ‡â€Œظ‡ط§غŒ ط²غŒط± ط±ط§ ط§ظ†طھط®ط§ط¨ ع©ظ†غŒط¯:"
+    )
+    await send(uid, text, kb_captcha(a * b, uid))
+
+async def send_rules_msg(uid):
+    text = (
+        "ًں“‹ <b>ظ‚ظˆط§ظ†غŒظ† ظˆ ط´ط±ط§غŒط· ط§ط³طھظپط§ط¯ظ‡ ط§ط² IranCloud VPN</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        "ظ„ط·ظپط§ظ‹ ظ‚ط¨ظ„ ط§ط² ط§ط³طھظپط§ط¯ظ‡ ط§ط² ط³ط±ظˆغŒط³طŒ ظ‚ظˆط§ظ†غŒظ† ط²غŒط± ط±ط§ ط¨ط§ ط¯ظ‚طھ ط¨ط®ظˆط§ظ†غŒط¯:\n\n"
+        "1ï¸ڈâƒ£ <b>غŒع© ط­ط³ط§ط¨طŒ غŒع© ع©ط§ط±ط¨ط±</b>\n"
+        "ظ‡ط± ط­ط³ط§ط¨ ع©ط§ط±ط¨ط±غŒ طµط±ظپط§ظ‹ ط¨ط±ط§غŒ ط§ط³طھظپط§ط¯ظ‡ ط´ط®طµغŒ غŒع© ظ†ظپط± ظ…ط¬ط§ط² ط§ط³طھ. "
+        "ط§ط´طھط±ط§ع©â€Œع¯ط°ط§ط±غŒ ط§ع©ط§ظ†طھ ط¨ط§ ط¯غŒع¯ط±ط§ظ† ظ…ظ…ظ†ظˆط¹ ط§ط³طھ.\n\n"
+        "2ï¸ڈâƒ£ <b>ظ…ظ…ظ†ظˆط¹غŒطھ ظپط±ظˆط´ ظ…ط¬ط¯ط¯ ع©ط§ظ†ظپغŒع¯</b>\n"
+        "ظپط±ظˆط´ غŒط§ ظˆط§ع¯ط°ط§ط±غŒ ع©ط§ظ†ظپغŒع¯â€Œظ‡ط§غŒ ط®ط±غŒط¯ط§ط±غŒâ€Œط´ط¯ظ‡ ط¨ظ‡ ط¯غŒع¯ط±ط§ظ† ظ…ظ…ظ†ظˆط¹ ط§ط³طھ "
+        "ظˆ ظ…ظ†ط¬ط± ط¨ظ‡ طھط¹ظ„غŒظ‚ ط¯ط§ط¦ظ…غŒ ط­ط³ط§ط¨ ظ…غŒâ€Œط´ظˆط¯.\n\n"
+        "3ï¸ڈâƒ£ <b>ط§ط³طھظپط§ط¯ظ‡ ظ‚ط§ظ†ظˆظ†غŒ</b>\n"
+        "ط§ط³طھظپط§ط¯ظ‡ ط§ط² ط³ط±ظˆغŒط³ ط¨ط±ط§غŒ ظ‡ط±ع¯ظˆظ†ظ‡ ظپط¹ط§ظ„غŒطھ ط؛غŒط±ظ‚ط§ظ†ظˆظ†غŒطŒ "
+        "ط­ظ…ظ„ط§طھ ط³ط§غŒط¨ط±غŒطŒ ط§ط³ظ¾ظ… غŒط§ ط¢ط³غŒط¨ ط¨ظ‡ ط¯غŒع¯ط±ط§ظ† ظ…ظ…ظ†ظˆط¹ ط§ط³طھ.\n\n"
+        "4ï¸ڈâƒ£ <b>ط³غŒط§ط³طھ ط§ط³طھط±ط¯ط§ط¯</b>\n"
+        "ظ¾ط³ ط§ط² ظپط¹ط§ظ„â€Œط³ط§ط²غŒ ط³ط±ظˆغŒط³ ظˆ ط§ط±ط³ط§ظ„ ع©ط§ظ†ظپغŒع¯طŒ "
+        "ط§ظ…ع©ط§ظ† ط§ط³طھط±ط¯ط§ط¯ ظˆط¬ظ‡ ظˆط¬ظˆط¯ ظ†ط¯ط§ط±ط¯. "
+        "ط¯ط± طµظˆط±طھ ط¨ط±ظˆط² ظ…ط´ع©ظ„ ظپظ†غŒ ط§ط² ط·ط±ظپ ظ…ط§طŒ ط¬ط¨ط±ط§ظ† ط®ظˆط§ظ‡ط¯ ط´ط¯.\n\n"
+        "5ï¸ڈâƒ£ <b>ظ‚ط·ط¹غŒâ€Œظ‡ط§غŒ ظ…ظˆظ‚طھ</b>\n"
+        "ط¯ط± ظ…ظˆط§ط±ط¯غŒ ظ†ط§ط¯ط± ظ…ط§ظ†ظ†ط¯ ط¨ط±ظˆط²ط±ط³ط§ظ†غŒ ط³ط±ظˆط± غŒط§ ظ…ط´ع©ظ„ط§طھ ط´ط¨ع©ظ‡ ط§غŒظ†طھط±ظ†طھطŒ "
+        "ظ…ظ…ع©ظ† ط§ط³طھ ط³ط±ظˆغŒط³ ظ…ظˆظ‚طھط§ظ‹ ظ‚ط·ط¹ ط´ظˆط¯. "
+        "ط§غŒظ† ظ…ظˆط§ط±ط¯ ط¨ظ‡ ط²ظ…ط§ظ† ط§ط´طھط±ط§ع© ط§ط¶ط§ظپظ‡ ط®ظˆط§ظ‡ط¯ ط´ط¯.\n\n"
+        "6ï¸ڈâƒ£ <b>ظ¾ط´طھغŒط¨ط§ظ†غŒ</b>\n"
+        "طھغŒظ… ظ¾ط´طھغŒط¨ط§ظ†غŒ ظ…ط§ غ· ط±ظˆط² ظ‡ظپطھظ‡ ظ¾ط§ط³ط®ع¯ظˆغŒ ط³ط¤ط§ظ„ط§طھ ط´ظ…ط§ ط§ط³طھ.\n\n"
+        "ط¨ط§ ع©ظ„غŒع© ط±ظˆغŒ ط¯ع©ظ…ظ‡ ط²غŒط±طŒ ظ‚ظˆط§ظ†غŒظ† ط±ط§ ظ…غŒâ€Œظ¾ط°غŒط±غŒط¯:"
+    )
+    await send(uid, text, kb_rules())
+
+async def send_main(uid, fname=""):
+    u = get_user(uid)
+    is_admin = (uid == ADMIN_ID)
+    bal = get_balance(uid)
+    with db() as c:
+        active = c.execute("SELECT COUNT(*) FROM orders WHERE user_id=? AND status='active'", (uid,)).fetchone()[0]
+    text = (
+        f"ًںŒگ <b>IranCloud VPN â€” ظ¾ظ†ظ„ ط±ط³ظ…غŒ</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        f"ًں‘‹ ط³ظ„ط§ظ… <b>{fname}</b> ط¹ط²غŒط²!\n\n"
+        "ط¨ظ‡ ظ¾غŒط´ط±ظپطھظ‡â€Œطھط±غŒظ† ط³ط±ظˆغŒط³ VPN ط§غŒط±ط§ظ† ط®ظˆط´ ط¢ظ…ط¯غŒط¯.\n"
+        "ظ…ط§ ط¨ظ‡طھط±غŒظ† ط³ط±ظˆط±ظ‡ط§ ط±ط§ ط¨ط§ ط¨ط§ظ„ط§طھط±غŒظ† ع©غŒظپغŒطھ ط§ط±ط§ط¦ظ‡ ظ…غŒâ€Œط¯ظ‡غŒظ….\n\n"
+        "ًں“ٹ <b>ظˆط¶ط¹غŒطھ ط³ط±ظˆغŒط³â€Œظ‡ط§غŒ IranCloud:</b>\n"
+        f"â€¢ ظˆط¶ط¹غŒطھ ط³ط±ظˆط±ظ‡ط§: ًںں¢ ط¢ظ†ظ„ط§غŒظ† ظˆ ظ¾ط§غŒط¯ط§ط±\n"
+        f"â€¢ ظ…غŒط§ظ†ع¯غŒظ† ظ¾غŒظ†ع¯: غ±غ²ms\n"
+        f"â€¢ ط¢ظ¾طھط§غŒظ… ظ…ط§ظ‡ط§ظ†ظ‡: غ¹غ¹.غ¹ظھ\n\n"
+        f"ًں’¼ <b>ط§ط·ظ„ط§ط¹ط§طھ ط­ط³ط§ط¨ ط´ظ…ط§:</b>\n"
+        f"â€¢ ظ…ظˆط¬ظˆط¯غŒ ع©غŒظپ ظ¾ظˆظ„: <code>${bal:.2f}</code>\n"
+        f"â€¢ ط§ط´طھط±ط§ع©â€Œظ‡ط§غŒ ظپط¹ط§ظ„: {active} ط¹ط¯ط¯\n\n"
+        "ط§ط² ظ…ظ†ظˆغŒ ط²غŒط± ع¯ط²غŒظ†ظ‡ ظ…ظˆط±ط¯ظ†ط¸ط± ط±ط§ ط§ظ†طھط®ط§ط¨ ع©ظ†غŒط¯:"
+    )
+    await send_photo(uid, WELCOME_IMAGE, text, kb_main(is_admin))
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  /start
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+@bot.message_handler(commands=["start"])
+async def cmd_start(msg):
+    uid   = msg.from_user.id
+    fname = msg.from_user.full_name or ""
+    uname = msg.from_user.username or ""
+    create_user(uid, uname, fname)
+    u = get_user(uid)
+    if u[5]:
+        await bot.send_message(uid, "ًںڑ« ط­ط³ط§ط¨ ط´ظ…ط§ طھظˆط³ط· ظ…ط¯غŒط±غŒطھ ظ…ط³ط¯ظˆط¯ ط´ط¯ظ‡ ط§ط³طھ.\nط¨ط±ط§غŒ ط§ط·ظ„ط§ط¹ط§طھ ط¨غŒط´طھط± ط¨ط§ ظ¾ط´طھغŒط¨ط§ظ†غŒ طھظ…ط§ط³ ط¨ع¯غŒط±غŒط¯.")
+        return
+    if not u[6]:
+        await send_captcha(uid)
+        return
+    if not u[7]:
+        await send_rules_msg(uid)
+        return
+    if not await check_channel(uid):
+        await send_photo(uid, WELCOME_IMAGE,
+            "ًں‘‹ <b>ط®ظˆط´ ط¢ظ…ط¯غŒط¯ ط¨ظ‡ IranCloud VPN</b>\n\n"
+            "ط¨ط±ط§غŒ ط§ط³طھظپط§ط¯ظ‡ ط§ط² ط±ط¨ط§طھطŒ ط§ط¨طھط¯ط§ ط¨ط§غŒط¯ ط¯ط± ع©ط§ظ†ط§ظ„ ط±ط³ظ…غŒ ظ…ط§ ط¹ط¶ظˆ ط´ظˆغŒط¯.\n"
+            "ظ¾ط³ ط§ط² ط¹ط¶ظˆغŒطھ ط±ظˆغŒ ط¯ع©ظ…ظ‡ <b>ط¹ط¶ظˆ ط´ط¯ظ…</b> ع©ظ„غŒع© ع©ظ†غŒط¯:",
+            kb_join())
+        return
+    await send_main(uid, fname)
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  CALLBACKS â€” captcha / rules / join
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+@bot.callback_query_handler(func=lambda c: c.data.startswith("cap_"))
+async def cb_cap(call):
+    parts   = call.data.split("_")
+    chosen  = int(parts[1])
+    uid     = int(parts[2])
+    correct = captcha_store.get(uid)
+    if chosen == correct:
+        set_captcha(uid)
+        await answer_cb(call.id, "âœ… طھط£غŒغŒط¯ ط´ط¯!")
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        u = get_user(uid)
+        if not u[7]:
+            await send_rules_msg(uid)
+        else:
+            await send_main(uid, call.from_user.full_name)
+    else:
+        await answer_cb(call.id, "â‌Œ ظ¾ط§ط³ط® ط§ط´طھط¨ط§ظ‡ ط§ط³طھ! ط¯ظˆط¨ط§ط±ظ‡ طھظ„ط§ط´ ع©ظ†غŒط¯.", alert=True)
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await send_captcha(uid)
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "accept_rules")
+async def cb_accept_rules(call):
+    uid = call.from_user.id
+    set_rules(uid)
+    await answer_cb(call.id, "âœ… ظ‚ظˆط§ظ†غŒظ† ظ¾ط°غŒط±ظپطھظ‡ ط´ط¯")
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    if not await check_channel(uid):
+        await send_photo(uid, WELCOME_IMAGE,
+            "âœ… ظ‚ظˆط§ظ†غŒظ† ظ¾ط°غŒط±ظپطھظ‡ ط´ط¯.\n\nط­ط§ظ„ط§ ظ„ط·ظپط§ظ‹ ط¯ط± ع©ط§ظ†ط§ظ„ ظ…ط§ ط¹ط¶ظˆ ط´ظˆغŒط¯:",
+            kb_join())
+    else:
+        await send_main(uid, call.from_user.full_name)
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "check_join")
+async def cb_check_join(call):
+    uid = call.from_user.id
+    if await check_channel(uid):
+        await answer_cb(call.id, "âœ… ط¹ط¶ظˆغŒطھ طھط£غŒغŒط¯ ط´ط¯!")
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        await send_main(uid, call.from_user.full_name)
+    else:
+        await answer_cb(call.id, "â‌Œ ظ‡ظ†ظˆط² ط¯ط± ع©ط§ظ†ط§ظ„ ط¹ط¶ظˆ ظ†ط´ط¯ظ‡â€Œط§غŒط¯!", alert=True)
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  CALLBACKS â€” main menu
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+@bot.callback_query_handler(func=lambda c: c.data == "main")
+async def cb_main(call):
+    uid = call.from_user.id
+    await bot.delete_message(call.message.chat.id, call.message.message_id)
+    await send_main(uid, call.from_user.full_name)
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "buy_menu")
+async def cb_buy_menu(call):
+    text = (
+        "ًں›’ <b>ظپط±ظˆط´ع¯ط§ظ‡ ظ¾ع©غŒط¬â€Œظ‡ط§غŒ IranCloud VPN</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        "âœ… <b>طھظ…ط§ظ… ظ¾ع©غŒط¬â€Œظ‡ط§ ط´ط§ظ…ظ„:</b>\n"
+        "â€¢ ظ¾ط±ظˆطھع©ظ„â€Œظ‡ط§غŒ VMessطŒ VLESSطŒ Trojan ظˆ Reality\n"
+        "â€¢ ط³ط±ظˆط±ظ‡ط§غŒ ظ¾ط±ط³ط±ط¹طھ ط§ط±ظˆظ¾ط§غŒغŒ ظˆ ط¢ظ…ط±غŒع©ط§غŒغŒ\n"
+        "â€¢ ظ¾ط´طھغŒط¨ط§ظ†غŒ ط§ط² ط§ظ†ط¯ط±ظˆغŒط¯طŒ iOSطŒ ظˆغŒظ†ط¯ظˆط² ظˆ ظ…ع©\n"
+        "â€¢ ع©ط§ظ†ظپغŒع¯ ط¢ظ…ط§ط¯ظ‡ â€” ط¨ظ„ط§ظپط§طµظ„ظ‡ ظ¾ط³ ط§ط² ط®ط±غŒط¯\n\n"
+        "ًں’، <b>ط±ط§ظ‡ظ†ظ…ط§غŒ ط§ظ†طھط®ط§ط¨ ظ¾ع©غŒط¬:</b>\n"
+        "â€¢ ع©ط§ط±ط¨ط±غŒ ط³ط¨ع© (ط´ط¨ع©ظ‡â€Œظ‡ط§غŒ ط§ط¬طھظ…ط§ط¹غŒ): ظ¾ع©غŒط¬ غµ طھط§ غ±غ² ع¯غŒع¯\n"
+        "â€¢ ع©ط§ط±ط¨ط±غŒ ظ…طھظˆط³ط· (غŒظˆطھغŒظˆط¨ ظˆ ط¯ط§ظ†ظ„ظˆط¯): ظ¾ع©غŒط¬ غ²غ° طھط§ غ³غµ ع¯غŒع¯\n"
+        "â€¢ ع©ط§ط±ط¨ط±غŒ ط³ظ†ع¯غŒظ† ظˆ ط®ط§ظ†ظˆط§ط¯ظ‡: ظ¾ع©غŒط¬ ظ†ط§ظ…ط­ط¯ظˆط¯\n\n"
+        "ًں’° <b>ظ†ط±ط® طھط¨ط¯غŒظ„:</b> ظ‡ط± غ± غŒظˆâ€Œظˆظˆع†ط± = غ± ط¯ظ„ط§ط±\n\n"
+        "ظ¾ع©غŒط¬ ظ…ظˆط±ط¯ظ†ط¸ط± ط±ط§ ط§ظ†طھط®ط§ط¨ ع©ظ†غŒط¯:"
+    )
+    res = await edit_caption(call.message.chat.id, call.message.message_id, text, kb_buy())
+    if not res.get("ok"):
+        await send_photo(call.from_user.id, WELCOME_IMAGE, text, kb_buy())
+
+
+@bot.callback_query_handler(func=lambda c: c.data.startswith("plan_"))
+async def cb_plan(call):
+    uid     = call.from_user.id
+    plan_id = int(call.data.split("_")[1])
+    plan    = get_plan(plan_id)
+    if not plan:
+        await answer_cb(call.id, "â‌Œ ظ¾ع©غŒط¬ غŒط§ظپطھ ظ†ط´ط¯"); return
+    bal     = get_balance(uid)
+    enough  = bal >= plan["price"]
+
+    loc_lines = ""
+    for lc in plan.get("locations", []):
+        if lc in FLAG_EMOJIS:
+            loc_lines += f"    â€¢ {FLAG_EMOJIS[lc][0]}\n"
+
+    gb_text = "â™¾ ظ†ط§ظ…ط­ط¯ظˆط¯" if plan["gb"] == -1 else f"{plan['gb']} ع¯غŒع¯ط§ط¨ط§غŒطھ"
+    text = (
+        f"ًں“¦ <b>ط¬ط²ط¦غŒط§طھ ظ¾ع©غŒط¬: {plan['name']}</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        f"ًں“‹ <b>ظ…ط´ط®طµط§طھ ظپظ†غŒ:</b>\n"
+        f"{plan['desc']}\n\n"
+        f"ًںŒچ <b>ط³ط±ظˆط±ظ‡ط§غŒ ظ…ظˆط¬ظˆط¯:</b>\n{loc_lines}\n"
+        f"ًں’° <b>ظ‚غŒظ…طھ:</b> ${plan['price']} (ظ…ط¹ط§ط¯ظ„ {plan['price']} غŒظˆâ€Œظˆظˆع†ط±)\n\n"
+        f"â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n"
+        f"ًں‘› ظ…ظˆط¬ظˆط¯غŒ ظپط¹ظ„غŒ ع©غŒظپ ظ¾ظˆظ„ ط´ظ…ط§: <code>${bal:.2f}</code>\n"
+        f"{'âœ… ظ…ظˆط¬ظˆط¯غŒ ع©ط§ظپغŒ ط§ط³طھ. ظ…غŒâ€Œطھظˆط§ظ†غŒط¯ ط®ط±غŒط¯ ع©ظ†غŒط¯.' if enough else 'âڑ ï¸ڈ ظ…ظˆط¬ظˆط¯غŒ ظ†ط§ع©ط§ظپغŒ ط§ط³طھ. ط§ط¨طھط¯ط§ ع©غŒظپ ظ¾ظˆظ„ ط±ط§ ط´ط§ط±عک ع©ظ†غŒط¯.'}\n\n"
+        f"ًں’، <b>ظ†ط­ظˆظ‡ ط®ط±غŒط¯:</b>\n"
+        f"غ±. ع©غŒظپ ظ¾ظˆظ„ ط±ط§ ط¨ط§ غŒظˆâ€Œظˆظˆع†ط± ط´ط§ط±عک ع©ظ†غŒط¯\n"
+        f"غ². ط¯ع©ظ…ظ‡ ط®ط±غŒط¯ ط±ط§ ط¨ط²ظ†غŒط¯\n"
+        f"غ³. ع©ط§ظ†ظپغŒع¯ ط¢ظ…ط§ط¯ظ‡ ظپظˆط±غŒ ط§ط±ط³ط§ظ„ ظ…غŒâ€Œط´ظˆط¯"
+    )
+    res = await edit_caption(call.message.chat.id, call.message.message_id, text, kb_plan(plan_id, enough))
+    if not res.get("ok"):
+        await send_photo(uid, WELCOME_IMAGE, text, kb_plan(plan_id, enough))
+
+
+@bot.callback_query_handler(func=lambda c: c.data.startswith("buy_"))
+async def cb_buy(call):
+    uid     = call.from_user.id
+    plan_id = int(call.data.split("_")[1])
+    plan    = get_plan(plan_id)
+    bal     = get_balance(uid)
+    if bal < plan["price"]:
+        await answer_cb(call.id, "â‌Œ ظ…ظˆط¬ظˆط¯غŒ ع©ط§ظپغŒ ظ†غŒط³طھ! ط§ط¨طھط¯ط§ ع©غŒظپ ظ¾ظˆظ„ ط±ط§ ط´ط§ط±عک ع©ظ†غŒط¯.", alert=True)
+        return
+    update_balance(uid, -plan["price"])
+    log_tx(uid, -plan["price"], "purchase", plan["name"])
+    create_order(uid, plan)
+    config = "vmess://eyJob3N0IjoiaXJhbmNsb3VkLm5ldCIsInBvcnQiOjQ0MywicHMiOiJJcmFuQ2xvdWQifQ=="
+    try:
+        await send(ADMIN_ID,
+            f"ًں›’ <b>ط®ط±غŒط¯ ط¬ط¯غŒط¯!</b>\n"
+            f"ًں‘¤ {call.from_user.full_name} | @{call.from_user.username or 'â€”'}\n"
+            f"ًں†” <code>{uid}</code>\n"
+            f"ًں“¦ {plan['name']}\n"
+            f"ًں’² ${plan['price']}",
+            mk([btn("ًں‘¤ ظ…ط´ط§ظ‡ط¯ظ‡ ع©ط§ط±ط¨ط±", cb=f"adm_view_{uid}", style="primary")]))
+    except: pass
+    text = (
+        f"ًںژ‰ <b>ط®ط±غŒط¯ ظ…ظˆظپظ‚! â€” {plan['name']}</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        f"âœ… ط§ط´طھط±ط§ع© ط´ظ…ط§ ط¨ط§ ظ…ظˆظپظ‚غŒطھ ظپط¹ط§ظ„ ط´ط¯!\n\n"
+        f"ًں”‘ <b>ع©ط§ظ†ظپغŒع¯ ط§طھطµط§ظ„ ط´ظ…ط§:</b>\n"
+        f"<code>{config}</code>\n\n"
+        f"â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n"
+        f"ًں“± <b>ط±ط§ظ‡ظ†ظ…ط§غŒ ط§طھطµط§ظ„ â€” ط§ظ†ط¯ط±ظˆغŒط¯:</b>\n"
+        f"غ±. ط§ظ¾ <b>V2RayNG</b> غŒط§ <b>Hiddify</b> ط±ط§ ظ†طµط¨ ع©ظ†غŒط¯\n"
+        f"غ². ع©ط§ظ†ظپغŒع¯ ط¨ط§ظ„ط§ ط±ط§ ع©ظ¾غŒ ع©ظ†غŒط¯\n"
+        f"غ³. ط¯ط± ط§ظ¾ ط±ظˆغŒ + ط¨ط²ظ†غŒط¯ â†’ Import from Clipboard\n"
+        f"غ´. ط±ظˆغŒ ع©ط§ظ†ظپغŒع¯ ط¶ط±ط¨ط¯ط± ط¨ط²ظ†غŒط¯ طھط§ ظˆطµظ„ ط´ظˆغŒط¯\n\n"
+        f"ًںچژ <b>ط±ط§ظ‡ظ†ظ…ط§غŒ ط§طھطµط§ظ„ â€” iOS:</b>\n"
+        f"غ±. ط§ظ¾ <b>Streisand</b> غŒط§ <b>FoXray</b> ط±ط§ ظ†طµط¨ ع©ظ†غŒط¯\n"
+        f"غ². ع©ط§ظ†ظپغŒع¯ ط±ط§ ع©ظ¾غŒ ظˆ import ع©ظ†غŒط¯\n\n"
+        f"ًں’» <b>ط±ط§ظ‡ظ†ظ…ط§غŒ ط§طھطµط§ظ„ â€” ظˆغŒظ†ط¯ظˆط²:</b>\n"
+        f"غ±. ط¨ط±ظ†ط§ظ…ظ‡ <b>Hiddify</b> ط±ط§ ط¯ط§ظ†ظ„ظˆط¯ ع©ظ†غŒط¯\n"
+        f"غ². ع©ط§ظ†ظپغŒع¯ ط±ط§ import ع©ظ†غŒط¯\n\n"
+        f"âڈ³ <b>ط§ظ†ظ‚ط¶ط§غŒ ط§ط´طھط±ط§ع©:</b> {plan['days']} ط±ظˆط² ط¯غŒع¯ط±\n"
+        f"ًں’° <b>ظ…ظˆط¬ظˆط¯غŒ ط¨ط§ظ‚غŒâ€Œظ…ط§ظ†ط¯ظ‡:</b> <code>${get_balance(uid):.2f}</code>\n\n"
+        f"â‌“ ظ…ط´ع©ظ„غŒ ط¯ط§ط´طھغŒط¯طں ط§ط² ط¨ط®ط´ ظ¾ط´طھغŒط¨ط§ظ†غŒ ع©ظ…ع© ط¨ع¯غŒط±غŒط¯."
+    )
+    await answer_cb(call.id, "âœ… ط®ط±غŒط¯ ظ…ظˆظپظ‚!")
+    await send_photo(uid, WELCOME_IMAGE, text, kb_main(uid == ADMIN_ID))
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  CALLBACKS â€” wallet / charge
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+@bot.callback_query_handler(func=lambda c: c.data == "wallet")
+async def cb_wallet(call):
+    uid = call.from_user.id
+    bal = get_balance(uid)
+    with db() as c:
+        active = c.execute("SELECT COUNT(*) FROM orders WHERE user_id=? AND status='active'", (uid,)).fetchone()[0]
+        total  = c.execute("SELECT COUNT(*) FROM orders WHERE user_id=?", (uid,)).fetchone()[0]
+    text = (
+        f"ًں‘› <b>ع©غŒظپ ظ¾ظˆظ„ IranCloud</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        f"ًں’° <b>ظ…ظˆط¬ظˆط¯غŒ ظپط¹ظ„غŒ:</b> <code>${bal:.2f}</code>\n"
+        f"ًں“ٹ <b>ط®ظ„ط§طµظ‡ ط­ط³ط§ط¨:</b>\n"
+        f"â€¢ ط§ط´طھط±ط§ع©â€Œظ‡ط§غŒ ظپط¹ط§ظ„: {active} ط¹ط¯ط¯\n"
+        f"â€¢ ع©ظ„ ط®ط±غŒط¯ظ‡ط§: {total} ط¹ط¯ط¯\n\n"
+        f"â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n"
+        f"ًں’³ <b>ط´ط§ط±عک ع©غŒظپ ظ¾ظˆظ„ ط¨ط§ غŒظˆâ€Œظˆظˆع†ط±:</b>\n\n"
+        f"غŒظˆâ€Œظˆظˆع†ط± (U-Voucher) غŒع© ع©ط§ط±طھ ط§ط¹طھط¨ط§ط±غŒ ط¯غŒط¬غŒطھط§ظ„ ط§ط³طھ ع©ظ‡ "
+        f"ظ…غŒâ€Œطھظˆط§ظ†غŒط¯ ط§ط² ط³ط§غŒطھâ€Œظ‡ط§غŒ ظ…ط¹طھط¨ط± ط§غŒط±ط§ظ†غŒ ط®ط±غŒط¯ط§ط±غŒ ع©ظ†غŒط¯.\n\n"
+        f"ًں“Œ <b>ظ‡ط± غ± غŒظˆâ€Œظˆظˆع†ط± = غ± ط¯ظ„ط§ط±</b>\n\n"
+        f"âœ… <b>ظ…ط²ط§غŒط§غŒ غŒظˆâ€Œظˆظˆع†ط±:</b>\n"
+        f"â€¢ ط¨ط¯ظˆظ† ظ†غŒط§ط² ط¨ظ‡ ط§ط­ط±ط§ط² ظ‡ظˆغŒطھ\n"
+        f"â€¢ ط®ط±غŒط¯ ط¢ظ†ظ„ط§غŒظ† ط¯ط± ع©ظ…طھط± ط§ط² غµ ط¯ظ‚غŒظ‚ظ‡\n"
+        f"â€¢ ط´ط§ط±عک ظپظˆط±غŒ ظ¾ط³ ط§ط² طھط£غŒغŒط¯\n"
+        f"â€¢ ط§ظ…ظ† ظˆ ظ…ط·ظ…ط¦ظ†\n\n"
+        f"ًں”گ طھظ…ط§ظ… طھط±ط§ع©ظ†ط´â€Œظ‡ط§ ط±ظ…ط²ظ†ع¯ط§ط±غŒâ€Œط´ط¯ظ‡ ظˆ ط§ظ…ظ† ظ‡ط³طھظ†ط¯."
+    )
+    res = await edit_media(call.message.chat.id, call.message.message_id, WALLET_IMAGE, text, kb_wallet())
+    if not res.get("ok"):
+        await send_photo(uid, WALLET_IMAGE, text, kb_wallet())
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "charge_wallet")
+async def cb_charge(call):
+    text = (
+        "ًں’³ <b>ط´ط§ط±عک ع©غŒظپ ظ¾ظˆظ„ ط¨ط§ غŒظˆâ€Œظˆظˆع†ط±</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        "ًںژںï¸ڈ <b>غŒظˆâ€Œظˆظˆع†ط± (U-Voucher) ع†غŒط³طھطں</b>\n"
+        "غŒظˆâ€Œظˆظˆع†ط± غŒع© ع©ط¯ ط¯غŒط¬غŒطھط§ظ„ غ²غ° ط±ظ‚ظ…غŒ ط§ط³طھ ع©ظ‡ ط§ط±ط²ط´ ظ…ط´ط®طµغŒ ط¯ط§ط±ط¯. "
+        "ظ…ط«ظ„ ع©ط§ط±طھ ط´ط§ط±عک ط§غŒظ†طھط±ظ†طھغŒ ط§ظ…ط§ ط¨ط±ط§غŒ ظ¾ط±ط¯ط§ط®طھ ط¢ظ†ظ„ط§غŒظ†.\n\n"
+        "ًں’° <b>ظ†ط±ط® طھط¨ط¯غŒظ„:</b>\n"
+        "â€¢ غ± غŒظˆâ€Œظˆظˆع†ط± = غ± ط¯ظ„ط§ط± ط¢ظ…ط±غŒع©ط§\n"
+        "â€¢ غµ غŒظˆâ€Œظˆظˆع†ط± = غµ ط¯ظ„ط§ط±\n"
+        "â€¢ غ±غ° غŒظˆâ€Œظˆظˆع†ط± = غ±غ° ط¯ظ„ط§ط±\n\n"
+        "ًں›’ <b>ظ…ط±ط§ط­ظ„ ط®ط±غŒط¯ غŒظˆâ€Œظˆظˆع†ط±:</b>\n"
+        "غ±. ط±ظˆغŒ غŒع©غŒ ط§ط² ط³ط§غŒطھâ€Œظ‡ط§غŒ ط²غŒط± ع©ظ„غŒع© ع©ظ†غŒط¯\n"
+        "غ². ظ…ظ‚ط¯ط§ط± ظ…ظˆط±ط¯ظ†ط¸ط± ط±ط§ ط§ظ†طھط®ط§ط¨ ع©ظ†غŒط¯\n"
+        "غ³. ظ¾ط±ط¯ط§ط®طھ ط±ط§ ط§ظ†ط¬ط§ظ… ط¯ظ‡غŒط¯\n"
+        "غ´. ع©ط¯ غŒظˆâ€Œظˆظˆع†ط± ط¯ط±غŒط§ظپطھ ظ…غŒâ€Œع©ظ†غŒط¯\n"
+        "غµ. ط¨ط±ع¯ط±ط¯غŒط¯ ظˆ ع©ط¯ ط±ط§ ظˆط§ط±ط¯ ع©ظ†غŒط¯\n\n"
+        "ًں“Œ <b>ظ…ط«ط§ظ„ ع©ط¯ غŒظˆâ€Œظˆظˆع†ط±:</b>\n"
+        "<code>UV-1234-ABCD-5678-EFGH</code>\n\n"
+        "â¬‡ï¸ڈ ط³ط§غŒطھ ط®ط±غŒط¯ ط±ط§ ط§ظ†طھط®ط§ط¨ ع©ظ†غŒط¯:"
+    )
+    res = await edit_caption(call.message.chat.id, call.message.message_id, text, kb_charge())
+    if not res.get("ok"):
+        await send_photo(call.from_user.id, WALLET_IMAGE, text, kb_charge())
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "enter_voucher")
+async def cb_enter_voucher(call):
+    uid = call.from_user.id
+    pending_action[uid] = "voucher"
+    await answer_cb(call.id)
+    await send(uid,
+        "ًںژںï¸ڈ <b>ظˆط§ط±ط¯ ع©ط±ط¯ظ† ع©ط¯ غŒظˆâ€Œظˆظˆع†ط±</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        "ع©ط¯ غŒظˆâ€Œظˆظˆع†ط± ط®ظˆط¯ ط±ط§ ط¯ظ‚غŒظ‚ط§ظ‹ ظ‡ظ…ط§ظ†ط·ظˆط± ع©ظ‡ ط±ظˆغŒ ع©ط§ط±طھ ظ†ظˆط´طھظ‡طŒ ظˆط§ط±ط¯ ع©ظ†غŒط¯.\n\n"
+        "ًں“Œ <b>ظپط±ظ…طھ طµط­غŒط­:</b>\n"
+        "<code>UV-XXXX-XXXX-XXXX-XXXX</code>\n\n"
+        "âڑ ï¸ڈ ط¨ظ‡ ط­ط±ظˆظپ ط¨ط²ط±ع¯ ظˆ ع©ظˆع†ع© طھظˆط¬ظ‡ ع©ظ†غŒط¯.\n\n"
+        "ظ¾ط³ ط§ط² ط§ط±ط³ط§ظ„ ع©ط¯طŒ ط¯ط±ط®ظˆط§ط³طھ ط´ظ…ط§ ط¨ط±ط§غŒ ظ…ط¯غŒط± ط§ط±ط³ط§ظ„ ظ…غŒâ€Œط´ظˆط¯ "
+        "ظˆ ظ¾ط³ ط§ط² طھط£غŒغŒط¯طŒ ظ…ظˆط¬ظˆط¯غŒ ط¨ظ‡ ط­ط³ط§ط¨ ط´ظ…ط§ ط§ط¶ط§ظپظ‡ ظ…غŒâ€Œط´ظˆط¯.\n\n"
+        "ع©ط¯ ط±ط§ ط§ط±ط³ط§ظ„ ع©ظ†غŒط¯:",
+        mk([btn("â‌Œ ظ„ط؛ظˆ", cb="wallet", style="danger", eid=E["red"])]))
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "tx_history")
+async def cb_tx_history(call):
+    uid = call.from_user.id
+    with db() as c:
+        rows = c.execute(
+            "SELECT amount,type,detail,created_at FROM transactions WHERE user_id=? ORDER BY id DESC LIMIT 10",
+            (uid,)).fetchall()
+    if not rows:
+        await answer_cb(call.id, "ًں“œ طھط±ط§ع©ظ†ط´غŒ غŒط§ظپطھ ظ†ط´ط¯", alert=True); return
+    text = (
+        "ًں“œ <b>طھط§ط±غŒط®ع†ظ‡ طھط±ط§ع©ظ†ط´â€Œظ‡ط§غŒ ط´ظ…ط§</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+    )
+    for r in rows:
+        sign = "â‍•" if r[0] > 0 else "â‍–"
+        text += f"{sign} <b>${abs(r[0]):.2f}</b> | {r[1]} | {r[2]}\nًں“… {r[3][:16].replace('T',' ')}\n\n"
+    await send(uid, text, mk([btn("ًں”™ ط¨ط§ط²ع¯ط´طھ", cb="wallet")]))
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  CALLBACKS â€” account / support / info
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+@bot.callback_query_handler(func=lambda c: c.data == "account")
+async def cb_account(call):
+    uid = call.from_user.id
+    u = get_user(uid)
+    bal = get_balance(uid)
+    with db() as c:
+        orders = c.execute("SELECT id,plan_name,expires_at,config FROM orders WHERE user_id=? AND status='active'", (uid,)).fetchall()
+    text = (
+        "ًں‘¤ <b>ط­ط³ط§ط¨ ع©ط§ط±ط¨ط±غŒ IranCloud VPN</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        f"â€¢ ط´ظ†ط§ط³ظ‡ ع©ط§ط±ط¨ط±غŒ: <code>{uid}</code>\n"
+        f"â€¢ ظ†ط§ظ… ط´ظ…ط§: {call.from_user.full_name}\n"
+        f"â€¢ ظ†ط§ظ… ع©ط§ط±ط¨ط±غŒ: @{call.from_user.username or 'ط¨ط¯ظˆظ† غŒظˆط²ط±ظ†غŒظ…'}\n"
+        f"â€¢ طھط§ط±غŒط® ط¹ط¶ظˆغŒطھ: {u[4][:10]}\n"
+        f"â€¢ ظ…ظˆط¬ظˆط¯غŒ ط­ط³ط§ط¨: <code>${bal:.2f}</code>\n\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n"
+        "ًں“¦ <b>ط³ط±ظˆغŒط³â€Œظ‡ط§غŒ ظپط¹ط§ظ„ ط´ظ…ط§:</b>\n\n"
+    )
+    if not orders:
+        text += "â‌Œ ط´ظ…ط§ ط¯ط± ط­ط§ظ„ ط­ط§ط¶ط± ظ‡غŒع† ط³ط±ظˆغŒط³ ظپط¹ط§ظ„غŒ ظ†ط¯ط§ط±غŒط¯.\nط¨ط±ط§غŒ ط®ط±غŒط¯ ط³ط±ظˆغŒط³ ط¨ظ‡ ط¨ط®ط´ 'ط®ط±غŒط¯ ظ¾ظ†ظ„ VPN' ظ…ط±ط§ط¬ط¹ظ‡ ع©ظ†غŒط¯."
+    else:
+        for o in orders:
+            text += (
+                f"ًں†” <b>ط´ظ†ط§ط³ظ‡ ط§ط´طھط±ط§ع©: #{o[0]}</b>\n"
+                f"ًں“¦ ظ¾ع©غŒط¬: {o[1]}\n"
+                f"ًں“… طھط§ط±غŒط® ط§ظ†ظ‚ط¶ط§: {o[2][:10]}\n"
+                f"ًں”‘ ع©ط§ظ†ظپغŒع¯:\n<code>{o[3]}</code>\n\n"
+            )
+    res = await edit_media(call.message.chat.id, call.message.message_id, ACCOUNT_IMAGE, text, mk([btn("ًں”™ ط¨ط§ط²ع¯ط´طھ", cb="main")]))
+    if not res.get("ok"):
+        await send_photo(uid, ACCOUNT_IMAGE, text, mk([btn("ًں”™ ط¨ط§ط²ع¯ط´طھ", cb="main")]))
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "support")
+async def cb_support_menu(call):
+    text = (
+        "ًںژ« <b>ظ¾ط´طھغŒط¨ط§ظ†غŒ ط¢ظ†ظ„ط§غŒظ† IranCloud</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        "طھغŒظ… ظ¾ط´طھغŒط¨ط§ظ†غŒ ظ…ط§ ط¢ظ…ط§ط¯ظ‡ ظ¾ط§ط³ط®ع¯ظˆغŒغŒ ط¨ظ‡ ط³ط¤ط§ظ„ط§طھ ظˆ ظ…ط´ع©ظ„ط§طھ ط´ظ…ط§ط³طھ.\n\n"
+        "âڈ±ï¸ڈ <b>ط³ط§ط¹ط§طھ ع©ط§ط±غŒ:</b> غ· ط±ظˆط² ظ‡ظپطھظ‡طŒ غ²غ´ ط³ط§ط¹طھظ‡\n"
+        "ًںڑ€ <b>ط²ظ…ط§ظ† ظ¾ط§ط³ط®ع¯ظˆغŒغŒ:</b> ظ…ط¹ظ…ظˆظ„ط§ظ‹ ع©ظ…طھط± ط§ط² غ±غµ ط¯ظ‚غŒظ‚ظ‡\n\n"
+        "ًں’، <b>ظ‚ط¨ظ„ ط§ط² ط§ط±ط³ط§ظ„ طھغŒع©طھطŒ ظ…ط·ظ…ط¦ظ† ط´ظˆغŒط¯ ع©ظ‡:</b>\n"
+        "â€¢ ط±ط§ظ‡ظ†ظ…ط§غŒ ط§طھطµط§ظ„ ط±ط¨ط§طھ ط±ط§ ط®ظˆط§ظ†ط¯ظ‡â€Œط§غŒط¯.\n"
+        "â€¢ ظ†ط±ظ…â€Œط§ظپط²ط§ط± ط§طھطµط§ظ„ ط´ظ…ط§ ط¨ظ‡ ط¢ط®ط±غŒظ† ظ†ط³ط®ظ‡ ط¨ط±ظˆط²ط±ط³ط§ظ†غŒ ط´ط¯ظ‡ ط§ط³طھ.\n"
+        "â€¢ ظ…ط´ع©ظ„ ط®ظˆط¯ ط±ط§ ط¨ظ‡ طµظˆط±طھ ع©ط§ظ…ظ„ ظˆ ظ‡ظ…ط±ط§ظ‡ ط¨ط§ طھطµظˆغŒط± غŒط§ ظ…طھظ† ط®ط·ط§ ط¨ظپط±ط³طھغŒط¯.\n\n"
+        "ط¬ظ‡طھ ط§ط±ط³ط§ظ„ ظ¾غŒط§ظ… ط±ظˆغŒ ط¯ع©ظ…ظ‡ ط²غŒط± ع©ظ„غŒع© ع©ظ†غŒط¯:"
+    )
+    res = await edit_media(call.message.chat.id, call.message.message_id, SUPPORT_IMAGE, text, kb_support())
+    if not res.get("ok"):
+        await send_photo(call.from_user.id, SUPPORT_IMAGE, text, kb_support())
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "send_support")
+async def cb_send_support(call):
+    uid = call.from_user.id
+    pending_action[uid] = "ticket"
+    await answer_cb(call.id)
+    await send(uid,
+        "âœ‰ï¸ڈ <b>ط§ط±ط³ط§ظ„ ظ¾غŒط§ظ… ط¨ظ‡ ظ¾ط´طھغŒط¨ط§ظ†غŒ</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        "ظ„ط·ظپط§ظ‹ ظ…طھظ† ظ¾غŒط§ظ… غŒط§ ظ…ط´ع©ظ„ ط®ظˆط¯ ط±ط§ ط¨ظ‡ طµظˆط±طھ ع©ط§ظ…ظ„ ط¨ظ†ظˆغŒط³غŒط¯ ظˆ ط§ط±ط³ط§ظ„ ع©ظ†غŒط¯.\n"
+        "ظ…غŒâ€Œطھظˆط§ظ†غŒط¯ ط§ط·ظ„ط§ط¹ط§طھغŒ ظ…ط«ظ„ ط´ظ†ط§ط³ظ‡ ط§ط´طھط±ط§ع© غŒط§ ظ†ظˆط¹ ط¯ط³طھع¯ط§ظ‡ ط®ظˆط¯ ط±ط§ ظ‡ظ… ط°ع©ط± ع©ظ†غŒط¯.\n\n"
+        "ظ¾غŒط§ظ… ط®ظˆط¯ ط±ط§ ط¨ظپط±ط³طھغŒط¯:",
+        mk([btn("â‌Œ ظ„ط؛ظˆ", cb="support", style="danger", eid=E["red"])]))
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "guide")
+async def cb_guide(call):
+    text = (
+        "ًں“– <b>ط±ط§ظ‡ظ†ظ…ط§غŒ ع©ط§ظ…ظ„ ط§طھطµط§ظ„ ط¨ظ‡ IranCloud VPN</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        "ط³ط±ظˆغŒط³â€Œظ‡ط§غŒ ظ…ط§ ط§ط² ط¨ظ‡طھط±غŒظ† ظ¾ط±ظˆطھع©ظ„â€Œظ‡ط§غŒ ط±ظˆط² ط¯ظ†غŒط§ ط§ط³طھظپط§ط¯ظ‡ ظ…غŒâ€Œع©ظ†ظ†ط¯. ط¨ط±ط§غŒ ط§طھطµط§ظ„ ط§ط¨طھط¯ط§ ظ†ط±ظ…â€Œط§ظپط²ط§ط± ظ…ط±ط¨ظˆط· ط¨ظ‡ ط¯ط³طھع¯ط§ظ‡ ط®ظˆط¯ ط±ط§ ط¯ط§ظ†ظ„ظˆط¯ ع©ظ†غŒط¯.\n\n"
+        "ًں¤– <b>ط§ظ†ط¯ط±ظˆغŒط¯ (Android):</b>\n"
+        "غ±. ط¨ط±ظ†ط§ظ…ظ‡ <b>v2rayNG</b> ط±ط§ ط§ط² ع¯ظˆع¯ظ„ ظ¾ظ„غŒ ط¯ط§ظ†ظ„ظˆط¯ ع©ظ†غŒط¯.\n"
+        "غ². ع©ط§ظ†ظپغŒع¯ ط¯ط±غŒط§ظپطھغŒ ط§ط² ط±ط¨ط§طھ ط±ط§ ع©ظ¾غŒ ع©ظ†غŒط¯.\n"
+        "غ³. ظˆط§ط±ط¯ ط¨ط±ظ†ط§ظ…ظ‡ ط´ظˆغŒط¯طŒ ظ…ظ†ظˆغŒ ط¨ط§ظ„ط§ ط³ظ…طھ ط±ط§ط³طھ ط±ط§ ط¨ط§ط² ع©ظ†غŒط¯ ظˆ ع¯ط²غŒظ†ظ‡ <b>Import config from clipboard</b> ط±ط§ ط¨ط²ظ†غŒط¯.\n"
+        "غ´. ط±ظˆغŒ ع©ط§ظ†ظپغŒع¯ ط§ط¶ط§ظپظ‡ ط´ط¯ظ‡ ع©ظ„غŒع© ع©ظ†غŒط¯ ظˆ ط¯ع©ظ…ظ‡ ط¯ط§غŒط±ظ‡â€Œط§غŒ ظ¾ط§غŒغŒظ† ط±ط§ ط¨ط²ظ†غŒط¯ طھط§ ظ…طھطµظ„ ط´ظˆغŒط¯.\n\n"
+        "ًںچڈ <b>ط¢غŒظپظˆظ† ظˆ ط¢غŒظ¾ط¯ (iOS):</b>\n"
+        "غ±. ط¨ط±ظ†ط§ظ…ظ‡ <b>Streisand</b> غŒط§ <b>V2Box</b> ط±ط§ ط§ط² ط§ظ¾ ط§ط³طھظˆط± ط¯ط§ظ†ظ„ظˆط¯ ع©ظ†غŒط¯.\n"
+        "غ². ع©ط§ظ†ظپغŒع¯ ط±ط§ ع©ظ¾غŒ ع©ط±ط¯ظ‡ ظˆ ط¯ط± ط¨ط±ظ†ط§ظ…ظ‡ ظˆط§ط±ط¯ ع©ظ†غŒط¯.\n\n"
+        "ًں’» <b>ظˆغŒظ†ط¯ظˆط² (Windows):</b>\n"
+        "غ±. ط¨ط±ظ†ط§ظ…ظ‡ <b>v2rayN</b> غŒط§ <b>Hiddify Next</b> ط±ط§ ط¯ط§ظ†ظ„ظˆط¯ ع©ظ†غŒط¯.\n"
+        "غ². ع©ط§ظ†ظپغŒع¯ ط±ط§ ط§ط¶ط§ظپظ‡ ع©ط±ط¯ظ‡ ظˆ ط¯ع©ظ…ظ‡ ط§طھطµط§ظ„ ط±ط§ ط¨ط²ظ†غŒط¯.\n\n"
+        "ًں’، <b>ظ†ع©طھظ‡ ظ…ظ‡ظ…:</b> ط¯ط± طµظˆط±طھ ط¹ط¯ظ… ط§طھطµط§ظ„طŒ ط§غŒظ†طھط±ظ†طھ ع¯ظˆط´غŒ ط±ط§ ع†ظ†ط¯ ط«ط§ظ†غŒظ‡ ط±ظˆغŒ ط­ط§ظ„طھ ظ¾ط±ظˆط§ط² ط¨ع¯ط°ط§ط±غŒط¯ ظˆ ط¯ظˆط¨ط§ط±ظ‡ طھظ„ط§ط´ ع©ظ†غŒط¯."
+    )
+    await edit_caption(call.message.chat.id, call.message.message_id, text, mk([btn("ًں”™ ط¨ط§ط²ع¯ط´طھ", cb="main")]))
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "faq")
+async def cb_faq(call):
+    text = (
+        "â‌“ <b>ط³ظˆط§ظ„ط§طھ ظ…طھط¯ط§ظˆظ„ ع©ط§ط±ط¨ط±ط§ظ†</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        "â‌“ <b>ط³ط±ط¹طھ ط¯ط§ظ†ظ„ظˆط¯ ع†ط·ظˆط± ط§ط³طھطں</b>\n"
+        "ًںں¢ طھظ…ط§ظ… ط³ط±ظˆط±ظ‡ط§ ظ…ط¬ظ‡ط² ط¨ظ‡ ظ¾ظˆط±طھ غ±غ° ع¯غŒع¯ط§ط¨غŒطھ ط§ط®طھطµط§طµغŒ ظ‡ط³طھظ†ط¯ ظˆ ط¨ط§ظ„ط§طھط±غŒظ† ط³ط±ط¹طھ ظ…ظ…ع©ظ† ط´ط¨ع©ظ‡ ط´ظ…ط§ ط±ط§ ط§ط±ط§ط¦ظ‡ ظ…غŒâ€Œط¯ظ‡ظ†ط¯.\n\n"
+        "â‌“ <b>ط¢غŒط§ ط±ظˆغŒ ط§غŒظ†طھط±ظ†طھ ظ‡ظ…ط±ط§ظ‡ ط§ظˆظ„ ظˆ ط§غŒط±ط§ظ†ط³ظ„ ع©ط§ط± ظ…غŒâ€Œع©ظ†ط¯طں</b>\n"
+        "ًںں¢ ط¨ظ„ظ‡طŒ ط¨ظ‡ ط¯ظ„غŒظ„ ط§ط³طھظپط§ط¯ظ‡ ط§ط² ظ¾ط±ظˆطھع©ظ„ Reality ظˆ طھط؛غŒغŒط± ظ…ط¯ط§ظˆظ… ط³ط§ط®طھط§ط±طŒ ط±ظˆغŒ طھظ…ط§ظ… ط§ظ¾ط±ط§طھظˆط±ظ‡ط§ (ظ‡ظ…ط±ط§ظ‡ ط§ظˆظ„طŒ ط§غŒط±ط§ظ†ط³ظ„طŒ ط±ط§غŒطھظ„طŒ ظ…ط®ط§ط¨ط±ط§طھ ظˆ...) ع©ط§ظ…ظ„ط§ظ‹ ظ¾ط§غŒط¯ط§ط± ط§ط³طھ.\n\n"
+        "â‌“ <b>ع†ظ†ط¯ ط¯ط³طھع¯ط§ظ‡ ظ‡ظ…ط²ظ…ط§ظ† ظ…غŒâ€Œطھظˆط§ظ†ظ†ط¯ ظ…طھطµظ„ ط´ظˆظ†ط¯طں</b>\n"
+        "ًںں¢ ط¨ط³طھظ‡ ط¨ظ‡ ظ¾ع©غŒط¬غŒ ع©ظ‡ ط®ط±غŒط¯ط§ط±غŒ ظ…غŒâ€Œع©ظ†غŒط¯ ط¨غŒظ† غ² طھط§ غ±غ° ط¯ط³طھع¯ط§ظ‡ ط§ظ…ع©ط§ظ† ط§طھطµط§ظ„ ظ‡ظ…ط²ظ…ط§ظ† ظˆط¬ظˆط¯ ط¯ط§ط±ط¯.\n\n"
+        "â‌“ <b>ط¢غŒط§ ط¢غŒâ€Œظ¾غŒ ط«ط§ط¨طھ ط§ط³طھطں</b>\n"
+        "ًںں¢ ط¨ظ„ظ‡طŒ ط¢غŒâ€Œظ¾غŒ ط³ط±ظˆط±ظ‡ط§ ع©ط§ظ…ظ„ط§ظ‹ ط«ط§ط¨طھ ط¨ظˆط¯ظ‡ ظˆ ط¨ط±ط§غŒ ع©ط§ط±ظ‡ط§غŒغŒ ظ…ط«ظ„ طھط±غŒط¯ غŒط§ طµط±ط§ظپغŒ ظ…ظ†ط§ط³ط¨ ط§ط³طھ."
+    )
+    await edit_caption(call.message.chat.id, call.message.message_id, text, mk([btn("ًں”™ ط¨ط§ط²ع¯ط´طھ", cb="main")]))
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "rules_view")
+async def cb_rules_view(call):
+    text = (
+        "ًں“‹ <b>ظ‚ظˆط§ظ†غŒظ† ط³ط±ظˆغŒط³ ط¯ظ‡غŒ IranCloud</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        "1ï¸ڈâƒ£ ط§ط³طھظپط§ط¯ظ‡ ط§ط² ط§ع©ط§ظ†طھ ط¨ط±ط§غŒ ط§ط³ظ¾ظ…طŒ ط§طھع© ظˆ ع©ط§ط±ظ‡ط§غŒ ط؛غŒط±ظ‚ط§ظ†ظˆظ†غŒ ظ…ظ…ظ†ظˆط¹ ط§ط³طھ.\n"
+        "2ï¸ڈâƒ£ ط§ط´طھط±ط§ع©â€Œع¯ط°ط§ط±غŒ ط§ع©ط§ظ†طھ ط®ط§ط±ط¬ ط§ط² ط¸ط±ظپغŒطھ ظ…ط´ط®طµ ط´ط¯ظ‡ ظ¾ع©غŒط¬ ظ…ظ…ظ†ظˆط¹ ط§ط³طھ.\n"
+        "3ï¸ڈâƒ£ ظ¾ط³ ط§ط² طھط­ظˆغŒظ„ ع©ط§ظ†ظپغŒع¯ ط¨ظ‡ ظ‡غŒع† ظˆط¬ظ‡ ط¹ظˆط¯طھ ظˆط¬ظ‡ ظ†ط¯ط§ط±غŒظ….\n"
+        "4ï¸ڈâƒ£ ظ¾ط´طھغŒط¨ط§ظ†غŒ ظپظ‚ط· ط¨ط±ط§غŒ ظ…ط´ع©ظ„ط§طھ ظ…ط±ط¨ظˆط· ط¨ظ‡ ط³ط±ظˆط±ظ‡ط§غŒ ظ…ط§ط³طھطŒ ظ†ظ‡ طھظ†ط¸غŒظ…ط§طھ ط¯ط§ط®ظ„غŒ ط¯ط³طھع¯ط§ظ‡ ط´ظ…ط§.\n\n"
+        "ط§ط³طھظپط§ط¯ظ‡ ط§ط² ط±ط¨ط§طھ ط¨ظ‡ ظ…ظ†ط²ظ„ظ‡ ظ¾ط°غŒط±ط´ ع©ط§ظ…ظ„ ط§غŒظ† ظ‚ظˆط§ظ†غŒظ† ط§ط³طھ."
+    )
+    await edit_caption(call.message.chat.id, call.message.message_id, text, mk([btn("ًں”™ ط¨ط§ط²ع¯ط´طھ", cb="main")]))
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  ADMIN PANEL
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+@bot.callback_query_handler(func=lambda c: c.data == "admin_panel")
+async def cb_admin_panel(call):
+    if call.from_user.id != ADMIN_ID: return
+    text = (
+        "âڑ™ï¸ڈ <b>ظ¾ظ†ظ„ ظ…ط¯غŒط±غŒطھ ط±ط¨ط§طھ IranCloud</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        "ط¨ظ‡ ط¨ط®ط´ ظ…ط¯غŒط±غŒطھ ط®ظˆط´ ط¢ظ…ط¯غŒط¯. ط§ط² ط¯ع©ظ…ظ‡â€Œظ‡ط§غŒ ط²غŒط± ط¨ط±ط§غŒ ع©ظ†طھط±ظ„ ط±ط¨ط§طھ ط§ط³طھظپط§ط¯ظ‡ ع©ظ†غŒط¯:"
+    )
+    await edit_caption(call.message.chat.id, call.message.message_id, text, kb_admin())
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "adm_stats")
+async def cb_adm_stats(call):
+    if call.from_user.id != ADMIN_ID: return
+    total, banned, active, revenue, pending_v = get_stats()
+    text = (
+        "ًں“ٹ <b>ط¢ظ…ط§ط± ظˆ ط§ط±ظ‚ط§ظ… ط±ط¨ط§طھ IranCloud</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        f"â€¢ ع©ظ„ ع©ط§ط±ط¨ط±ط§ظ† ط«ط¨طھ ط´ط¯ظ‡: {total} ظ†ظپط±\n"
+        f"â€¢ ع©ط§ط±ط¨ط±ط§ظ† ظ…ط³ط¯ظˆط¯ ط´ط¯ظ‡: {banned} ظ†ظپط±\n"
+        f"â€¢ ط§ط´طھط±ط§ع©â€Œظ‡ط§غŒ ظپط¹ط§ظ„ ط³غŒط³طھظ…غŒ: {active} ط¹ط¯ط¯\n"
+        f"â€¢ ع©ظ„ ط¯ط±ط¢ظ…ط¯ظ‡ط§غŒ ط«ط¨طھ ط´ط¯ظ‡: ${revenue:.2f}\n"
+        f"â€¢ ظˆظˆع†ط±ظ‡ط§غŒ ط¯ط± ط§ظ†طھط¸ط§ط± طھط£غŒغŒط¯: {pending_v} ط¹ط¯ط¯\n"
+    )
+    await send(ADMIN_ID, text, mk([btn("ًں”™ ط¨ط§ط²ع¯ط´طھ ط¨ظ‡ ظ¾ظ†ظ„", cb="admin_panel")]))
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "adm_tickets")
+async def cb_adm_tickets(call):
+    if call.from_user.id != ADMIN_ID: return
+    with db() as c:
+        tickets = c.execute("SELECT id,user_id,message FROM support_tickets WHERE status='open' LIMIT 5").fetchall()
+    if not tickets:
+        await answer_cb(call.id, "âœ… ظ‡غŒع† طھغŒع©طھ ط¨ط§ط²غŒ ظˆط¬ظˆط¯ ظ†ط¯ط§ط±ط¯", alert=True); return
+    text = "ًں“‹ <b>طھغŒع©طھâ€Œظ‡ط§غŒ ظ¾ط´طھغŒط¨ط§ظ†غŒ ط¨ط§ط²:</b>\n\n"
+    for t in tickets:
+        text += f"ًں†” <b>طھغŒع©طھ #{t[0]}</b> | ع©ط§ط±ط¨ط±: <code>{t[1]}</code>\nًں“‌ ظ…طھظ†: {t[2]}\n\n"
+    await send(ADMIN_ID, text, mk(
+        [btn("âœچï¸ڈ ظ¾ط§ط³ط® ط¨ظ‡ طھغŒع©طھ", cb="adm_reply_tk", style="primary")],
+        [btn("ًں”™ ط¨ط§ط²ع¯ط´طھ", cb="admin_panel")]
+    ))
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "adm_reply_tk")
+async def cb_adm_reply_tk(call):
+    if call.from_user.id != ADMIN_ID: return
+    pending_action[ADMIN_ID] = "reply_ticket_id"
+    await send(ADMIN_ID, "ًں“چ ظ„ط·ظپط§ظ‹ ط´ظ†ط§ط³ظ‡ طھغŒع©طھ (ظ…ط«ط§ظ„: 5) ط±ط§ ظˆط§ط±ط¯ ع©ظ†غŒط¯:")
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "adm_vouchers")
+async def cb_adm_vouchers(call):
+    if call.from_user.id != ADMIN_ID: return
+    with db() as c:
+        rows = c.execute("SELECT id,user_id,code,amount FROM pending_vouchers WHERE status='pending' LIMIT 1").fetchall()
+    if not rows:
+        await answer_cb(call.id, "ًں’ژ ظ‡غŒع† ظˆظˆع†ط±غŒ ط¯ط± ط§ظ†طھط¸ط§ط± ظ†غŒط³طھ", alert=True); return
+    r = rows[0]
+    text = (
+        "ًں’ژ <b>ط¨ط±ط±ط³غŒ ظˆظˆع†ط± ط¯ط± ط§ظ†طھط¸ط§ط±</b>\n"
+        "â”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پâ”پ\n\n"
+        f"â€¢ ط´ظ†ط§ط³ظ‡ طھط±ط§ع©ظ†ط´: {r[0]}\n"
+        f"â€¢ ع©ط§ط±ط¨ط±: <code>{r[1]}</code>\n"
+        f"â€¢ ع©ط¯ ظˆظˆع†ط±: <code>{r[2]}</code>\n"
+        f"â€¢ ظ…ط¨ظ„ط؛ ط­ط¯ظˆط¯غŒ: ${r[3]}\n"
+    )
+    await send(ADMIN_ID, text, mk([
+        btn("âœ… طھط£غŒغŒط¯ ظˆ ط´ط§ط±عک", cb=f"v_app_{r[0]}", style="success"),
+        btn("â‌Œ ط±ط¯ ط¯ط±ط®ظˆط§ط³طھ", cb=f"v_rej_{r[0]}", style="danger")
+    ], [btn("ًں”™ ط¨ط§ط²ع¯ط´طھ", cb="admin_panel")]))
+
+
+@bot.callback_query_handler(func=lambda c: c.data.startswith("v_app_"))
+async def cb_v_app(call):
+    if call.from_user.id != ADMIN_ID: return
+    vid = int(call.data.split("_")[2])
+    ok, data = approve_voucher(vid)
+    if ok:
+        await answer_cb(call.id, "âœ… ظˆظˆع†ط± طھط§غŒغŒط¯ ظˆ ط­ط³ط§ط¨ ط´ط§ط±عک ط´ط¯")
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        try:
+            await send(data[1], f"âœ… <b>ط§ظپط²ط§غŒط´ ظ…ظˆط¬ظˆط¯غŒ!</b>\n\nط¯ط±ط®ظˆط§ط³طھ ط´ط§ط±عک ط´ظ…ط§ ط¨ط§ ع©ط¯ <code>{data[2]}</code> طھط§غŒغŒط¯ ط´ط¯ ظˆ ظ…ط¨ظ„ط؛ <b>${data[3]}</b> ط¨ظ‡ ع©غŒظپ ظ¾ظˆظ„ ط´ظ…ط§ ط§ط¶ط§ظپظ‡ ع¯ط±ط¯غŒط¯.")
+        except: pass
+    else:
+        await answer_cb(call.id, f"â‌Œ ط®ط·ط§: {data}", alert=True)
+
+
+@bot.callback_query_handler(func=lambda c: c.data.startswith("v_rej_"))
+async def cb_v_rej(call):
+    if call.from_user.id != ADMIN_ID: return
+    vid = int(call.data.split("_")[2])
+    data = reject_voucher(vid)
+    if data:
+        await answer_cb(call.id, "â‌Œ ظˆظˆع†ط± ط±ط¯ ط´ط¯")
+        await bot.delete_message(call.message.chat.id, call.message.message_id)
+        try:
+            await send(data[1], f"â‌Œ <b>ط¯ط±ط®ظˆط§ط³طھ ط´ط§ط±عک ط±ط¯ ط´ط¯</b>\n\nط¯ط±ط®ظˆط§ط³طھ ط´ط§ط±عک ط´ظ…ط§ ط¨ط§ ع©ط¯ <code>{data[2]}</code> طھظˆط³ط· ظ…ط¯غŒط±غŒطھ ط±ط¯ ط´ط¯. ط¯ط± طµظˆط±طھ ظˆط¬ظˆط¯ ظ…ط´ع©ظ„ ط¨ظ‡ ظ¾ط´طھغŒط¨ط§ظ†غŒ ظ¾غŒط§ظ… ط¯ظ‡غŒط¯.")
+        except: pass
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "adm_broadcast")
+async def cb_adm_broadcast(call):
+    if call.from_user.id != ADMIN_ID: return
+    pending_action[ADMIN_ID] = "broadcast"
+    await send(ADMIN_ID, "ًں“¢ ظ…طھظ† ظ¾غŒط§ظ… ظ‡ظ…ع¯ط§ظ†غŒ ط®ظˆط¯ ط±ط§ ط¨ظپط±ط³طھغŒط¯ (ظ‚ط§ظ„ط¨ HTML ظ…ط¬ط§ط² ط§ط³طھ):")
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "adm_search")
+async def cb_adm_search(call):
+    if call.from_user.id != ADMIN_ID: return
+    pending_action[ADMIN_ID] = "search_user"
+    await send(ADMIN_ID, "ًں‘¤ ط´ظ†ط§ط³ظ‡ ط¹ط¯ط¯غŒ ع©ط§ط±ط¨ط± ظ…ظˆط±ط¯ ظ†ط¸ط± ط±ط§ ط¨ظپط±ط³طھغŒط¯:")
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "adm_add_bal")
+async def cb_adm_add_bal(call):
+    if call.from_user.id != ADMIN_ID: return
+    pending_action[ADMIN_ID] = "add_balance_id"
+    await send(ADMIN_ID, "ًں’° ط´ظ†ط§ط³ظ‡ ع©ط§ط±ط¨ط± ط±ط§ ط¨ظپط±ط³طھغŒط¯:")
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "adm_dec_bal")
+async def cb_adm_dec_bal(call):
+    if call.from_user.id != ADMIN_ID: return
+    pending_action[ADMIN_ID] = "dec_balance_id"
+    await send(ADMIN_ID, "ًں’¸ ط´ظ†ط§ط³ظ‡ ع©ط§ط±ط¨ط± ط±ط§ ط¨ظپط±ط³طھغŒط¯:")
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "adm_ban")
+async def cb_adm_ban(call):
+    if call.from_user.id != ADMIN_ID: return
+    pending_action[ADMIN_ID] = "ban_id"
+    await send(ADMIN_ID, "ًںڑ« ط´ظ†ط§ط³ظ‡ ع©ط§ط±ط¨ط± ط¬ظ‡طھ ظ…ط³ط¯ظˆط¯ط³ط§ط²غŒ ط±ط§ ط¨ظپط±ط³طھغŒط¯:")
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "adm_unban")
+async def cb_adm_unban(call):
+    if call.from_user.id != ADMIN_ID: return
+    pending_action[ADMIN_ID] = "unban_id"
+    await send(ADMIN_ID, "âœ… ط´ظ†ط§ط³ظ‡ ع©ط§ط±ط¨ط± ط¬ظ‡طھ ط¢ظ†ط¨ظ„ط§ع© ط±ط§ ط¨ظپط±ط³طھغŒط¯:")
+
+
+@bot.callback_query_handler(func=lambda c: c.data == "adm_make_voucher")
+async def cb_adm_make_voucher(call):
+    if call.from_user.id != ADMIN_ID: return
+    pending_action[ADMIN_ID] = "make_voucher_amount"
+    await send(ADMIN_ID, "ًںژںï¸ڈ ظ…ط¨ظ„ط؛ ظˆظˆع†ط± ع©ط¯غŒ ط±ط§ ط¨ظ‡ ط¯ظ„ط§ط± ظˆط§ط±ط¯ ع©ظ†غŒط¯ (ظ…ط«ط§ظ„: 5.5):")
+
+
+@bot.callback_query_handler(func=lambda c: c.data.startswith("adm_view_"))
+async def cb_adm_view(call):
+    if call.from_user.id != ADMIN_ID: return
+    tuid = int(call.data.split("_")[2])
+    u = get_user(tuid)
+    if not u:
+        await answer_cb(call.id, "ع©ط§ط±ط¨ط± غŒط§ظپطھ ظ†ط´ط¯", alert=True); return
+    bal = get_balance(tuid)
+    text = (
+        f"ًں‘¤ <b>ظ¾ط±ظˆظپط§غŒظ„ ظ…ط¯غŒط±غŒطھغŒ ع©ط§ط±ط¨ط±:</b>\n\n"
+        f"â€¢ ط´ظ†ط§ط³ظ‡: <code>{u[0]}</code>\n"
+        f"â€¢ غŒظˆط²ط±ظ†غŒظ…: @{u[1] or 'â€”'}\n"
+        f"â€¢ ظ†ط§ظ…: {u[2]}\n"
+        f"â€¢ ظ…ظˆط¬ظˆط¯غŒ: ${bal:.2f}\n"
+        f"â€¢ ظˆط¶ط¹غŒطھ ط¨ظ„ط§ع©: {'ًںڑ« ظ…ط³ط¯ظˆط¯' if u[5] else 'âœ… ط¢ط²ط§ط¯'}\n"
+    )
+    await send(ADMIN_ID, text, mk(
+        [btn("â‍• ط§ظپط²ط§غŒط´ ظ…ظˆط¬ظˆط¯غŒ", cb=f"adm_add_{tuid}"), btn("â‍– ع©ط§ظ‡ط´ ظ…ظˆط¬ظˆط¯غŒ", cb=f"adm_dec_{tuid}")],
+        [btn("ًںڑ« ط¨ظ„ط§ع©", cb=f"adm_b_{tuid}"), btn("âœ… ط¢ظ†ط¨ظ„ط§ع©", cb=f"adm_u_{tuid}")],
+        [btn("ًں“© ط§ط±ط³ط§ظ„ ظ¾غŒط§ظ… ظ…ط³طھظ‚غŒظ…", cb=f"adm_pm_{tuid}")]
+    ))
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  TEXT MESSAGES HANDLER
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+@bot.message_handler(content_types=["text"])
+async def handle_text(msg):
+    uid  = msg.from_user.id
+    u    = get_user(uid)
+    if u and u[5]: return
+
+    action = pending_action.get(uid)
+
+    # USER ACTIONS
+    if action == "voucher":
+        code = msg.text.strip()
+        if not code.startswith("UV-") or len(code) < 10:
+            await bot.reply_to(msg, "â‌Œ ظپط±ظ…طھ ع©ط¯ غŒظˆâ€Œظˆظˆع†ط± ط§ط´طھط¨ط§ظ‡ ط§ط³طھ. ط¨ط§غŒط¯ ط¨ط§ UV- ط´ط±ظˆط¹ ط´ظˆط¯. ط¯ظˆط¨ط§ط±ظ‡ طھظ„ط§ط´ ع©ظ†غŒط¯:")
+            return
+        del pending_action[uid]
+        # ط§غŒط¬ط§ط¯ ظ…ط¨ظ„ط؛ طھطµط§ط¯ظپغŒ ظپط±ط¶غŒ ط¨ط±ط§غŒ طھط§غŒغŒط¯ ظ…ط¯غŒط±غŒطھ
+        amount = random.randint(1, 20)
+        vid = add_pending_voucher(uid, code, amount)
+        await bot.reply_to(msg, "âœ… <b>ع©ط¯ ط´ظ…ط§ ط¯ط±غŒط§ظپطھ ط´ط¯!</b>\n\nط¯ط±ط®ظˆط§ط³طھ ط´ط§ط±عک ط¨ط±ط§غŒ ظ…ط¯غŒط±غŒطھ ط§ط±ط³ط§ظ„ ط´ط¯ ظˆ ظ¾ط³ ط§ط² ط¨ط±ط±ط³غŒ ط­ط³ط§ط¨ ط´ظ…ط§ ط´ط§ط±عک ط®ظˆط§ظ‡ط¯ ط´ط¯. ظ„ط·ظپط§ظ‹ طµط¨ظˆط± ط¨ط§ط´غŒط¯.")
+        try:
+            await send(ADMIN_ID,
+                f"ًں’ژ <b>ط¯ط±ط®ظˆط§ط³طھ ط´ط§ط±عک ط¬ط¯غŒط¯ (ظˆظˆع†ط±)!</b>\n\n"
+                f"â€¢ ع©ط§ط±ط¨ط±: {msg.from_user.full_name} (<code>{uid}</code>)\n"
+                f"â€¢ ع©ط¯ ط§ط±ط³ط§ظ„غŒ: <code>{code}</code>\n"
+                f"â€¢ ط´ظ†ط§ط³ظ‡ ط³غŒط³طھظ…: {vid}",
+                mk([
+                    btn("âœ… طھط§غŒغŒط¯ ظˆ ط´ط§ط±عک", cb=f"v_app_{vid}", style="success"),
+                    btn("â‌Œ ط±ط¯ ط¯ط±ط®ظˆط§ط³طھ", cb=f"v_rej_{vid}", style="danger")
+                ]))
+        except: pass
+        return
+
+    if action == "ticket":
+        if len(msg.text) < 5:
+            await bot.reply_to(msg, "â‌Œ ظ…طھظ† ظ¾غŒط§ظ… ط®غŒظ„غŒ ع©ظˆطھط§ظ‡ ط§ط³طھ. ظ„ط·ظپط§ظ‹ ط¨غŒط´طھط± طھظˆط¶غŒط­ ط¯ظ‡غŒط¯:")
+            return
+        del pending_action[uid]
+        with db() as c:
+            c.execute("INSERT INTO support_tickets (user_id,message,created_at) VALUES (?,?,?)",
+                      (uid, msg.text, datetime.now().isoformat()))
+            tid = c.lastrowid
+        await bot.reply_to(msg, f"âœ… طھغŒع©طھ ط´ظ…ط§ ط¨ط§ ط´ظ…ط§ط±ظ‡ <b>#{tid}</b> ط«ط¨طھ ط´ط¯. ط¨ظ‡ ط²ظˆط¯غŒ ظ¾ط´طھغŒط¨ط§ظ† ظ¾ط§ط³ط® ط´ظ…ط§ ط±ط§ ط®ظˆط§ظ‡ط¯ ط¯ط§ط¯.")
+        try:
+            await send(ADMIN_ID,
+                f"ًںژ« <b>طھغŒع©طھ ظ¾ط´طھغŒط¨ط§ظ†غŒ ط¬ط¯غŒط¯! #{tid}</b>\n"
+                f"â€¢ ع©ط§ط±ط¨ط±: {msg.from_user.full_name} | <code>{uid}</code>\n"
+                f"â€¢ ظ…طھظ† ظ¾غŒط§ظ…: {msg.text}",
+                mk([btn("âœچï¸ڈ ظ¾ط§ط³ط® ظپظˆط±غŒ", cb=f"ticket_reply_{tid}_{uid}", style="success")]))
+        except: pass
+        return
+
+    # ADMIN ACTIONS
+    if uid == ADMIN_ID:
+        if action == "broadcast":
+            del pending_action[uid]
+            users = get_all_users()
+            await bot.reply_to(msg, f"ًںڑ€ ظپط±ط¢غŒظ†ط¯ ط§ط±ط³ط§ظ„ ظ¾غŒط§ظ… ظ‡ظ…ع¯ط§ظ†غŒ ط¨ط±ط§غŒ {len(users)} ع©ط§ط±ط¨ط± ط¢ط؛ط§ط² ط´ط¯...")
+            success = 0
+            for us_id in users:
+                try:
+                    await bot.send_message(us_id, msg.text, parse_mode="HTML")
+                    success += 1
+                    await asyncio.sleep(0.05)
+                except: pass
+            await send(ADMIN_ID, f"âœ… ط§ط±ط³ط§ظ„ ظ¾غŒط§ظ… ظ‡ظ…ع¯ط§ظ†غŒ ط¨ظ‡ ظ¾ط§غŒط§ظ† ط±ط³غŒط¯.\nًں“ٹ ظ…ظˆظپظ‚: {success} ط§ط² {len(users)}")
+            return
+
+        if action == "search_user":
+            del pending_action[uid]
+            try: tuid = int(msg.text)
+            except: await bot.reply_to(msg, "â‌Œ ط®ط·ط§ ط¯ط± ظپط±ظ…طھ ط´ظ†ط§ط³ظ‡"); return
+            user = get_user(tuid)
+            if not user:
+                await bot.reply_to(msg, "â‌Œ ع©ط§ط±ط¨ط± ط¯ط± ط¯غŒطھط§ط¨غŒط³ غŒط§ظپطھ ظ†ط´ط¯.")
+                return
+            bal = get_balance(tuid)
+            await send(ADMIN_ID, f"ًں‘¤ ع©ط§ط±ط¨ط± غŒط§ظپطھ ط´ط¯:\n\nظ†ط§ظ…: {user[2]}\nغŒظˆط²ط±ظ†غŒظ…: @{user[1]}\nظ…ظˆط¬ظˆط¯غŒ: ${bal}",
+                       mk([btn("ًں”چ ظ…ط´ط§ظ‡ط¯ظ‡ ظ¾ط±ظˆظپط§غŒظ„ ظ…ط¯غŒط±غŒطھغŒ", cb=f"adm_view_{tuid}")]))
+            return
+
+        if action == "add_balance_id":
+            try: tuid = int(msg.text)
+            except: await bot.reply_to(msg, "â‌Œ ط®ط·ط§"); return
+            pending_action[uid] = f"add_balance_amount_{tuid}"
+            await bot.reply_to(msg, f"ًں’° ظ…ظ‚ط¯ط§ط± ط´ط§ط±عک (ط¯ظ„ط§ط±) ط¨ط±ط§غŒ ع©ط§ط±ط¨ط± {tuid} ط±ط§ ظˆط§ط±ط¯ ع©ظ†غŒط¯:")
+            return
+
+        if action and action.startswith("add_balance_amount_"):
+            tuid = int(action.split("_")[3])
+            del pending_action[uid]
+            try: amt = float(msg.text)
+            except: await bot.reply_to(msg, "â‌Œ ط®ط·ط§ ط¯ط± ظپط±ظ…طھ ظ…ط¨ظ„ط؛"); return
+            update_balance(tuid, amt)
+            log_tx(tuid, amt, "admin_gift", "ط´ط§ط±عک طھظˆط³ط· ظ…ط¯غŒط±غŒطھ")
+            await bot.reply_to(msg, f"âœ… ظ…ط¨ظ„ط؛ ${amt} ط¨ظ‡ ط­ط³ط§ط¨ {tuid} ط§ط¶ط§ظپظ‡ ط´ط¯.")
+            try: await send(tuid, f"ًںژپ <b>ع©غŒظپ ظ¾ظˆظ„ ط´ظ…ط§ ط´ط§ط±عک ط´ط¯!</b>\n\nظ…ط¨ظ„ط؛ <b>${amt}</b> طھظˆط³ط· ظ…ط¯غŒط±غŒطھ ط¨ظ‡ ط­ط³ط§ط¨ ط´ظ…ط§ ظˆط§ط±غŒط² ع¯ط±ط¯غŒط¯.\nًں’° ظ…ظˆط¬ظˆط¯غŒ ط¬ط¯غŒط¯: ${get_balance(tuid):.2f}")
+            except: pass
+            return
+
+        if action == "dec_balance_id":
+            try: tuid = int(msg.text)
+            except: await bot.reply_to(msg, "â‌Œ ط®ط·ط§"); return
+            pending_action[uid] = f"dec_balance_amount_{tuid}"
+            await bot.reply_to(msg, f"ًں’¸ ظ…ظ‚ط¯ط§ط± ع©ط§ظ‡ط´ (ط¯ظ„ط§ط±) ط¨ط±ط§غŒ ع©ط§ط±ط¨ط± {tuid} ط±ط§ ظˆط§ط±ط¯ ع©ظ†غŒط¯:")
+            return
+
+        if action and action.startswith("dec_balance_amount_"):
+            tuid = int(action.split("_")[3])
+            del pending_action[uid]
+            try: amt = float(msg.text)
+            except: await bot.reply_to(msg, "â‌Œ ط®ط·ط§ ط¯ط± ظپط±ظ…طھ ظ…ط¨ظ„ط؛"); return
+            update_balance(tuid, -amt)
+            log_tx(tuid, -amt, "admin_deduct", "ع©ط§ظ‡ط´ طھظˆط³ط· ظ…ط¯غŒط±غŒطھ")
+            await bot.reply_to(msg, f"âœ… ظ…ط¨ظ„ط؛ ${amt} ط§ط² ط­ط³ط§ط¨ {tuid} ع©ط³ط± ط´ط¯.")
+            return
+
+        if action == "ban_id":
+            del pending_action[uid]
+            try: tuid = int(msg.text)
+            except: await bot.reply_to(msg, "â‌Œ ط®ط·ط§"); return
+            ban_user(tuid, True)
+            await bot.reply_to(msg, f"ًںڑ« ع©ط§ط±ط¨ط± {tuid} ط¨ط§ ظ…ظˆظپظ‚غŒطھ ظ…ط³ط¯ظˆط¯ ط´ط¯.")
+            return
+
+        if action == "unban_id":
+            del pending_action[uid]
+            try: tuid = int(msg.text)
+            except: await bot.reply_to(msg, "â‌Œ ط®ط·ط§"); return
+            ban_user(tuid, False)
+            await bot.reply_to(msg, f"âœ… ع©ط§ط±ط¨ط± {tuid} ط¢ظ†ط¨ظ„ط§ع© ط´ط¯.")
+            return
+
+        if action == "make_voucher_amount":
+            del pending_action[uid]
+            try: amt = float(msg.text)
+            except: await bot.reply_to(msg, "â‌Œ ط®ط·ط§"); return
+            code = "UV-" + "".join(random.choices(string.ascii_uppercase + string.digits, k=16))
+            add_voucher_db(code, amt)
+            await bot.reply_to(msg, f"ًںژںï¸ڈ <b>ظˆظˆع†ط± ط¨ط§ ظ…ظˆظپظ‚غŒطھ ط³ط§ط®طھظ‡ ط´ط¯!</b>\n\nع©ط¯ ظˆظˆع†ط±:\n<code>{code}</code>\nظ…ط¨ظ„ط؛: ${amt}")
+            return
+
+        if action == "reply_ticket_id":
+            try: tid = int(msg.text)
+            except: await bot.reply_to(msg, "â‌Œ ط®ط·ط§"); return
+            with db() as c:
+                tk = c.execute("SELECT user_id,message FROM support_tickets WHERE id=?", (tid,)).fetchone()
+            if not tk:
+                await bot.reply_to(msg, "â‌Œ طھغŒع©طھ غŒط§ظپطھ ظ†ط´ط¯."); return
+            pending_action[uid] = f"ticket_reply_{tid}_{tk[0]}"
+            await bot.reply_to(msg, f"âœچï¸ڈ ظ¾ط§ط³ط® ط®ظˆط¯ ط¨ظ‡ طھغŒع©طھ #{tid} (ع©ط§ط±ط¨ط± {tk[0]}) ط±ط§ ط¨ظپط±ط³طھغŒط¯:\n\nظ¾غŒط§ظ… ع©ط§ط±ط¨ط±: {tk[1]}")
+            return
+
+        if action and action.startswith("adm_pm_"):
+            tuid = int(action.split("_")[2])
+            del pending_action[uid]
+            try:
+                await send(tuid, f"ًں“¨ <b>ظ¾ط§ط³ط® ظ¾ط´طھغŒط¨ط§ظ†غŒ IranCloud:</b>\n\n{msg.text}",
+                    mk([btn("ًںژ« ظ¾ط´طھغŒط¨ط§ظ†غŒ", cb="support", style="primary", eid=E["link"])]))
+                await bot.reply_to(msg, "âœ… ظ¾ط§ط³ط® ط§ط±ط³ط§ظ„ ط´ط¯")
+            except: await bot.reply_to(msg, "â‌Œ ط§ط±ط³ط§ظ„ ظ†ط§ظ…ظˆظپظ‚")
+            return
+
+        if action and action.startswith("ticket_reply_"):
+            parts = action.split("_")
+            tid, tuid = parts[2], parts[3]
+            del pending_action[uid]
+            with db() as c:
+                c.execute("UPDATE support_tickets SET reply=?,status='closed' WHERE id=?", (msg.text, tid))
+            try:
+                await send(int(tuid),
+                    f"ًں“¨ <b>ظ¾ط§ط³ط® ط¨ظ‡ طھغŒع©طھ #{tid}:</b>\n\n{msg.text}",
+                    mk([btn("ًںژ« ظ¾ط´طھغŒط¨ط§ظ†غŒ", cb="support", style="primary", eid=E["link"])]))
+                await bot.reply_to(msg, "âœ… ظ¾ط§ط³ط® ط§ط±ط³ط§ظ„ ط´ط¯")
+            except: await bot.reply_to(msg, "â‌Œ ط§ط±ط³ط§ظ„ ظ†ط§ظ…ظˆظپظ‚")
+            return
+
+    # default
+    if u and u[6] and u[7]:
+        await send_main(uid, msg.from_user.full_name)
+
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+#  RUN
+# â•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گâ•گ
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(bot.polling(none_stop=True))
